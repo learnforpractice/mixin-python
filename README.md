@@ -1,5 +1,30 @@
 # Python Bindings for Mixin
 
+# Dependencies
+
+clang & go 1.6 & cmake
+
+
+# Build
+
+```
+git clone https://github.com/learnforpractice/mixin-python --recursive
+cd mixin-python
+python3 -m pip install -r requirements.txt 
+```
+
+Linux
+
+```
+./build_linux.sh
+```
+
+macOS X
+
+```
+./build_mac.sh
+```
+
 ```python
 from mixin.mixin_api import MixinApi
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
