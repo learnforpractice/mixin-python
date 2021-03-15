@@ -7,3 +7,7 @@ PyYAML==5.1
 requests==2.21.0
 websocket-client==0.54.0
 websockets
+
+scikit-build
+cython
+pytest
