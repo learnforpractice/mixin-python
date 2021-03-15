@@ -37,5 +37,5 @@ api.create_address()
 
 # License
 
-[LICENSE](./LICENSE)
+[GPL3.0](./LICENSE)
 
