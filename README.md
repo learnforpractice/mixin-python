@@ -1,6 +1,8 @@
 # Python Bindings for Mixin
 
 ```python
+from mixin.mixin_api import MixinApi
+api = MixinApi('http://mixin-node0.exinpool.com:8239')
 api.create_address()
 ```
 
