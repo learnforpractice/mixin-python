@@ -198,7 +198,6 @@ class TestMixinApi(object):
 #            "Node":
         }
         params = {
-            "node": 'http://mixin-node0.exinpool.com:8239',
             "seed": '', #account['spend_key'],
             "key": json.dumps([account['view_key'] + account['spend_key']]),
             "raw": json.dumps(trx),
@@ -272,7 +271,6 @@ class TestMixinApi(object):
 #            "Node":
         }
         params = {
-            "node": 'http://mixin-node0.exinpool.com:8239',
             "seed": '', #account['spend_key'],
             "key": json.dumps([account['view_key'] + account['spend_key']]),
             "raw": json.dumps(trx),
@@ -346,7 +344,6 @@ class TestMixinApi(object):
 #            "Node":
         }
         params = {
-            "node": 'http://mixin-node0.exinpool.com:8239',
             "seed": '', #account['spend_key'],
             "key": json.dumps([account['view_key'] + account['spend_key']]),
             "raw": json.dumps(trx),
@@ -364,7 +361,6 @@ class TestMixinApi(object):
             "raw": r['raw'],
             "trx": json.dumps(trx),
             "keys": json.dumps([account['view_key'] + account['spend_key']]),
-            "node": 'http://mixin-node0.exinpool.com:8239'
         }
         signature = self.api.sign_raw_transaction(params)
         logger.info(signature)
@@ -375,7 +371,6 @@ class TestMixinApi(object):
             "raw": r['raw'],
             "trx": json.dumps(trx),
             "keys": json.dumps([account2['view_key'] + account2['spend_key']]),
-            "node": 'http://mixin-node0.exinpool.com:8239'
         }
         signature = self.api.sign_raw_transaction(params)
         logger.info(signature)

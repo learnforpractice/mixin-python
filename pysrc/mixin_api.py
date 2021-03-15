@@ -91,6 +91,7 @@ class MixinApi(object):
         keys
         node
         '''
+        params["node"] = self.node_url
         params = json.dumps(params)
         ret = _mixin.sign_raw_transaction(params)
         ret = json.loads(ret)
@@ -184,6 +185,7 @@ class MixinApi(object):
             "key":
         }
         '''
+        params["node"] = self.node_url
         if isinstance(params, dict):
             params = json.dumps(params)
         ret = _mixin.sign_transaction(params)
