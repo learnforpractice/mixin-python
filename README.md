@@ -21,7 +21,7 @@ clang & go 1.6 & cmake
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
 cd mixin-python
-python3 -m pip install -r requirements.txt 
+python3 -m pip install -r requirements-dev.txt 
 ```
 
 Linux
