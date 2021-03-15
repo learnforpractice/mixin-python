@@ -19,7 +19,7 @@ cdef extern from "<Python.h>":
 
 cdef extern from "libmixin.h":
     void Init();
-    int MixinMain(char* args);
+    int MixinMain(char* args) nogil
     char* CreateAddress(char* _params);
     char* GetPublicKey(char* seed);
 
@@ -40,8 +40,11 @@ cdef extern from "libmixin.h":
 
     char* SignRawTransaction(char* params)
 
-def main(args):
-    MixinMain(args)
+def main(_args):
+    cdef char* args
+    args = _args
+    with nogil:
+        MixinMain(args)
 
 def init():
     Init()
