@@ -25,6 +25,14 @@ macOS X
 ./build_mac.sh
 ```
 
+# Installation
+
+```bash
+python3 -m pip install dist/mixin-0.1.0-*
+```
+
+# Quick Start
+
 ```python
 from mixin.mixin_api import MixinApi
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
