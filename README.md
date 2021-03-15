@@ -54,6 +54,10 @@ api.create_address()
      'view_key': '6396fd4201bbec6f495ded697428003dfd227578174f97e034c94e1abb420d0f',
      'spend_key': '02f0ea8504740a1c2916e1b9965c23c242aeeb02d093f3f1ed0e5e0d494bc603'}
 
+# Reference
+
+https://github.com/wenewzhang/mixin-python3-sdk
+
 # License
 
 [GPL3.0](./LICENSE)
