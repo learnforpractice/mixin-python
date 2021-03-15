@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import pytest
 import ctypes
 import logging
 import uuid
