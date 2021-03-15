@@ -30,7 +30,6 @@ setup(
     data_files = data_files,
     scripts=[],
     install_requires=[
-        "cryptography>=3.2",
         "pycparser==2.19",
         "pycryptodome==3.7.2",
         "PyJWT==1.7.1",
