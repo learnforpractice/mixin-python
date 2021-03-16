@@ -216,20 +216,26 @@ class MixinApi(object):
         r = await self.client.post(self.node_url, json=data, headers=headers)
         r = r.json()
         if 'error' in r:
-            return r['error']
+            raise Exception(r['error'])
         return r['data']
 
     async def send_transaction(self, raw):
         data = {'method': 'sendrawtransaction', 'params': [raw]}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = await self.client.post(self.node_url, json=data, headers=headers)
-        return r.json()
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
 
     async def get_transaction(self, trx_hash):
         data = {'method': 'gettransaction', 'params': [trx_hash]}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = await self.client.post(self.node_url, json=data, headers=headers)
-        return json.loads(r.text)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
 
     def pledge_node(self, params):
         if isinstance(params, dict):
