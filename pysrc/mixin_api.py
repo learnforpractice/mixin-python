@@ -214,7 +214,10 @@ class MixinApi(object):
         data = {'method': 'getinfo', 'params': []}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = await self.client.post(self.node_url, json=data, headers=headers)
-        return r.json()
+        r = r.json()
+        if 'error' in r:
+            return r['error']
+        return r['data']
 
     async def send_transaction(self, raw):
         data = {'method': 'sendrawtransaction', 'params': [raw]}
