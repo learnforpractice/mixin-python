@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import pytest
@@ -12,6 +13,7 @@ import asyncio
 import threading
 import shlex
 import signal
+import shutil
 import subprocess
 from io import BytesIO
 
@@ -30,6 +32,14 @@ class TestMixinApi(object):
     @classmethod
     def setup_class(cls):
         cls.nodes = []
+        # if '--newtestnet' in sys.argv:
+        if True:
+            for i in range(7):
+                port = 7001+i
+                config_dir = f'/tmp/mixin-{port}'
+                if os.path.exists(config_dir):
+                    shutil.rmtree(config_dir)
+
         if not os.path.exists('/tmp/mixin-7001'):
             cmd = f'python3 -m mixin.main setuptestnet'
             args = shlex.split(cmd)
@@ -39,7 +49,8 @@ class TestMixinApi(object):
 
         for i in range(7):
             port = 7001+i
-            cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            cmd = f'mixin kernel -dir /tmp/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)
             p = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -123,6 +134,12 @@ class TestMixinApi(object):
             'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
         }
 
+        account2 = {
+            'address': 'XINHJLCRBWJ3AgcrNhKppVMvjinapzumLVL253opKzs6Jk5bUBHWKH6paPr2exhwqYZ3FcPtbnitJMF6TXk8UcEx8u2nUt4S',
+            'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
+            'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
+        }
+
         trx = {
             "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
             "inputs": [{
@@ -156,17 +173,111 @@ class TestMixinApi(object):
         logger.info(r)
         r = await self.api.send_transaction(r['raw'])
         logger.info(r)
+        deposit_hash = r['hash']
 
-        await asyncio.sleep(3.0)
-        r = await self.api.get_transaction(r['hash'])
+#        await asyncio.sleep(3.0)
+        while True:
+            r = await self.api.get_transaction(deposit_hash)
+            if r:
+                break
+            await asyncio.sleep(0.5)
         logger.info(r)
 
-'''
-./src/mixin/mixin kernel -dir ./testnet/config-7001 -port 7001
-./src/mixin/mixin kernel -dir ./testnet/config-7002 -port 7002
-./src/mixin/mixin kernel -dir ./testnet/config-7003 -port 7003
-./src/mixin/mixin kernel -dir ./testnet/config-7004 -port 7004
-./src/mixin/mixin kernel -dir ./testnet/config-7005 -port 7005
-./src/mixin/mixin kernel -dir ./testnet/config-7006 -port 7006
-./src/mixin/mixin kernel -dir ./testnet/config-7007 -port 7007
-'''
+        trx = {
+            "asset": 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc',
+            "inputs": [
+                {
+                "hash": deposit_hash,
+                "index": 0
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "51",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                },
+                {
+                "amount": "49",
+                "accounts": [account2['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+
+        logger.info(trx)
+        params = {
+            "seed": '', #account['spend_key'],
+            "key": json.dumps([account['view_key'] + account['spend_key']]),
+            "raw": json.dumps(trx),
+            "inputIndex": "0"
+        }
+        r = await self.api.get_info()
+
+        for i in range(10):
+            try:
+                r = self.api.sign_transaction(params)
+                logger.info(r)
+                r = await self.api.send_transaction(r['raw'])
+                break
+            except Exception as e:
+                logger.info(e)
+                await asyncio.sleep(1.0)
+
+        else:
+            raise Exception('transfer test failed!')
+        logger.info(r)
+
+    @pytest.mark.asyncio
+    async def test_transfer(self):
+        trx_hash = 'ade6278a710712d5f3da4d8bef243b157a43463089b8fcc9a214811120268391'
+
+        account = {
+            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
+            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
+            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
+        }
+
+        account2 = {
+            'address': 'XINHJLCRBWJ3AgcrNhKppVMvjinapzumLVL253opKzs6Jk5bUBHWKH6paPr2exhwqYZ3FcPtbnitJMF6TXk8UcEx8u2nUt4S',
+            'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
+            'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
+        }
+
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [
+                {
+                "hash": trx_hash,
+                "index": 0
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "51",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                },
+                {
+                "amount": "49",
+                "accounts": [account2['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+
+        logger.info(trx)
+        params = {
+            "seed": '', #account['spend_key'],
+            "key": json.dumps([account['view_key'] + account['spend_key']]),
+            "raw": json.dumps(trx),
+            "inputIndex": "0"
+        }
+        r = self.api.sign_transaction(params)
+        logger.info(r)
+        r = await self.api.send_transaction(r['raw'])
+        logger.info(r)
