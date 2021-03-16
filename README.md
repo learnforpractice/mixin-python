@@ -13,7 +13,7 @@
 
 # Dependencies
 
-clang & go 1.6 & cmake
+clang & go 1.16 & cmake
 
 
 # Build
