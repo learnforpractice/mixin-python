@@ -40,13 +40,24 @@ class TestMixinApi(object):
         r = self.api.create_address()
         logger.warning(r)
 
+        args = {
+            "view_key": "",
+            "spend_key": "",
+            "public":False
+        }
+        address = self.api.create_address(**args)
+        addr = address['address']
+        decoded_address = self.api.decode_address(addr)
+        assert decoded_address['public_spend_key'] == self.api.get_public_key(address['spend_key'])
+        assert decoded_address['public_view_key'] == self.api.get_public_key(address['view_key'])
+
         # Specify view_key
         args = {
             "view_key": "8d4a7902b87af98b86aef7df48599a129389b97fbce9be3a095497cd1fc21308",
             "spend_key": "",
             "public":False
         }
-        r = self.api.create_address(args)
+        r = self.api.create_address(**args)
         assert r['view_key'] == args['view_key']
 
         args = {
@@ -54,7 +65,7 @@ class TestMixinApi(object):
             "spend_key": "8d4a7902b87af98b86aef7df48599a129389b97fbce9be3a095497cd1fc21308",
             "public":False
         }
-        r = self.api.create_address(args)
+        r = self.api.create_address(**args)
         assert r['spend_key'] == args['spend_key']
 
         args = {
@@ -62,7 +73,7 @@ class TestMixinApi(object):
             "spend_key": "e61eda099a3b99d685c23d0ac7f6704bb9c279db90b4d71cd4014d07f4256d07",
             "public":False
         }
-        r = self.api.create_address(args)
+        r = self.api.create_address(**args)
         assert r['view_key'] == args['view_key']
         assert r['spend_key'] == args['spend_key']
 
@@ -71,7 +82,7 @@ class TestMixinApi(object):
             "spend_key": "e61eda099a3b99d685c23d0ac7f6704bb9c279db90b4d71cd4014d07f4256d07",
             "public":True
         }
-        r = self.api.create_address(args)
+        r = self.api.create_address(**args)
         assert not r['view_key'] == args['view_key']
         assert r['spend_key'] == args['spend_key']
 

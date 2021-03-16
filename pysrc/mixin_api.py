@@ -32,7 +32,12 @@ class MixinApi(object):
     def set_node(self, url):
         self.node_url = url
 
-    def create_address(self, params={}):
+    def create_address(self, spend_key="", view_key="", public=False):
+        params = {
+            "view_key": view_key,
+            "spend_key": spend_key,
+            "public": public
+        }
         ret = _mixin.create_address(json.dumps(params))
         ret = json.loads(ret)
         if 'error' in ret:
@@ -47,6 +52,15 @@ class MixinApi(object):
         return ret['data']
 
     def decode_address(self, addr):
+        '''
+        Example:
+        from mixin.mixin_api import MixinApi
+        api = MixinApi('http://mixin-node0.exinpool.com:8239')
+        address = api.create_address()
+        addr = address['address']
+        r = api.decode_address(addr)
+        print(r)
+        '''
         ret = _mixin.decode_address(addr)
         ret = json.loads(ret)
         if 'error' in ret:
