@@ -68,6 +68,8 @@ class MixinTestnet(object):
         nodes = json.dumps(nodes, indent=' ')
 
         self.config_dirs = []
+        if not os.path.exists('testnet'):
+            os.mkdir('testnet')
         for i in range(7):
             port = 7001+i
             config = '''
@@ -81,7 +83,10 @@ ring-final-size = 16384
 [network]
 listener = "127.0.0.1:%s" 
             '''%(self.node_addresses[i]['signer']['view_key'], port)
-            temp_dir = tempfile.mkdtemp()
+
+            temp_dir = os.path.join('testnet', f'config-{port}')
+            os.mkdir(temp_dir)
+
             self.config_dirs.append(temp_dir)
 
             config_file = os.path.join(temp_dir, 'config.toml')
@@ -100,7 +105,7 @@ listener = "127.0.0.1:%s"
             node_addresses=self.node_addresses,
             config_dirs=self.config_dirs
         )
-        with open('testnet.json', 'w') as f:
+        with open('testnet/testnet.json', 'w') as f:
             testnet_config = json.dumps(testnet_config, indent=' ')
             f.write(testnet_config)
 
@@ -117,12 +122,12 @@ listener = "127.0.0.1:%s"
             self.nodes.append(p)
 
     def start(self):
-        if os.path.exists('testnet.json'):
-            return self.restart('testnet.json')
+        if os.path.exists('testnet/testnet.json'):
+            return self.restart('testnet/testnet.json')
         self._create()
         self._start()
 
-    def restart(self, testnet_config_file='testnet.json'):
+    def restart(self, testnet_config_file='testnet/testnet.json'):
         with open(testnet_config_file, 'r') as f:
             testnet_config = f.read()
             testnet_config = json.loads(testnet_config)
@@ -136,8 +141,8 @@ listener = "127.0.0.1:%s"
             p.kill()
 
         if cleanup:
-            if os.path.exists('testnet.json'):
-                os.remove('testnet.json')
+            if os.path.exists('testnet/testnet.json'):
+                os.remove('testnet/testnet.json')
  
             if self.config_dirs:
                 for d in self.config_dirs:
