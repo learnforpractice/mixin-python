@@ -1,3 +1,5 @@
+cp.sh
+dd
 _skbuild
 # Byte-compiled / optimized / DLL files
 __pycache__/
