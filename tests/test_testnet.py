@@ -12,6 +12,7 @@ import gzip
 import random
 import asyncio
 import threading
+import subprocess
 from io import BytesIO
 import httpx
 
