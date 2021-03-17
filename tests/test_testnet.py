@@ -32,7 +32,7 @@ class TestMixinApi(object):
         loop = asyncio.get_event_loop()        
         async def wait():
             api = MixinApi('http://127.0.0.1:8007')
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(2)
             while True:
                 try:
                     await cls.api.get_info()
