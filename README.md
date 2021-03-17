@@ -72,6 +72,15 @@ python3 -m mixin.main kernel --dir config --port 9000
 python3 tests/start_testnet.py
 ```
 
+# Run tests in jupyter notebook
+```bash
+python3 -m pip install notebook
+cd notebook
+python3 -m notebook
+```
+Open helloworld.ipynb, hit Ctrl+Enter to run the test code in cell
+
+Do not forget to run testnet.stop() to stop the testnet, otherwise the testnet processes will still running in the backgroud.
 
 # Reference
 
