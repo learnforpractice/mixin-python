@@ -131,7 +131,8 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
             config_dir = self.config_dirs[i]
             cmd = f'python3 -m mixin.main kernel -dir {config_dir} -port {port}'
             args = shlex.split(cmd)
-            p = subprocess.Popen(args, stdout=subprocess.PIPE)
+            log = open(f'{config_dir}/log.txt', 'a')
+            p = subprocess.Popen(args, stdout=log, stderr=log)
             self.nodes.append(p)
 
     def start(self):

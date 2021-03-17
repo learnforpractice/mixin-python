@@ -55,7 +55,8 @@ class TestMixinApi(object):
             cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)
-            p = subprocess.Popen(args, stdout=subprocess.PIPE)
+            log = open(f'/tmp/mixin-700{i+1}/log.txt', 'a')
+            p = subprocess.Popen(args, stdout=log, stderr=log)
             cls.nodes.append(p)
         logger.info('++++++')
         cls.api = MixinApi('http://127.0.0.1:8001')
