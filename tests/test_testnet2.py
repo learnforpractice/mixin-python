@@ -49,7 +49,7 @@ class TestMixinApi(object):
             p.wait()
             logger.info('+++done!')
 
-        for i in range(1):
+        for i in range(7):
             port = 7001+i
             # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
