@@ -1,3 +1,5 @@
+# tests base on:
+# https://prsdigg.com/articles/4375be62-6ef4-4de2-af9a-086816380fde
 import os
 import sys
 import json
@@ -47,7 +49,7 @@ class TestMixinApi(object):
             p.wait()
             logger.info('+++done!')
 
-        for i in range(7):
+        for i in range(1):
             port = 7001+i
             # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'

@@ -1,3 +1,5 @@
+# tests base on:
+# https://prsdigg.com/articles/4375be62-6ef4-4de2-af9a-086816380fde
 import os
 import json
 import time
@@ -26,7 +28,10 @@ class TestMixinApi(object):
     @classmethod
     def setup_class(cls):
         cls.testnet = MixinTestnet()
+        # cls.testnet.start()
+        # cls.testnet.stop(cleanup=True)
         cls.testnet.start()
+
         cls.api = MixinApi('http://127.0.0.1:8001')
 
         loop = asyncio.get_event_loop()        
@@ -39,12 +44,12 @@ class TestMixinApi(object):
                     return
                 except Exception as e:
                     await asyncio.sleep(0.5)
-                    # logger.info(e)
+                    logger.info(e)
         loop.run_until_complete(wait())
 
     @classmethod
     def teardown_class(cls):
-        cls.testnet.shutdown(cleanup=True)
+        cls.testnet.stop(cleanup=True)
 
     def setup_method(self, method):
         logger.warning('test start: %s', method.__name__)
@@ -72,6 +77,17 @@ class TestMixinApi(object):
 
     @pytest.mark.asyncio
     async def test_deposit(self):
+        async def monitor():
+            for i in range(7):
+                n = self.testnet.nodes[i]
+                try:
+                    ret = n.wait(1.0)
+                    if ret != 0:
+                        logger.error('++++++++subprocess {i} exited abnormal')
+                except subprocess.TimeoutExpired:
+                    pass
+        asyncio.create_task(monitor())
+
         account = {
             'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
             'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
@@ -122,6 +138,7 @@ class TestMixinApi(object):
             r = await self.api.get_transaction(deposit_hash)
             if r:
                 break
+            logger.info('++++get_transaction(%s), retrying...', deposit_hash)
             await asyncio.sleep(0.5)
         # logger.info(r)
 

@@ -13,11 +13,24 @@ logger = log.get_logger(__name__)
 class MixinTestnet(object):
 
     def __init__(self):
-        self.api = MixinApi('')
+        self.api = MixinApi('http://127.0.0.1:8001')
         self.genesis = None
         self.node_addresses = None
         self.config_dirs = None
+        self.deposit_hash = None
         self.nodes = []
+
+        self.test_account = {
+            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
+            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
+            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
+        }
+
+        self.test_account2 = {
+            'address': 'XINHJLCRBWJ3AgcrNhKppVMvjinapzumLVL253opKzs6Jk5bUBHWKH6paPr2exhwqYZ3FcPtbnitJMF6TXk8UcEx8u2nUt4S',
+            'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
+            'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
+        }
 
     def create_test_genesis(self):
         genesis = {
@@ -136,7 +149,45 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
             self.config_dirs=testnet_config["config_dirs"]
         self._start()
 
-    def shutdown(self, cleanup=False):
+    async def deposit(self):
+        if self.deposit_hash:
+            return self.deposit_hash
+
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [{
+                "deposit": {
+                "chain": "8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27",
+                "asset": "0xa974c709cfb4566686553a20790685a47aceaa33",
+                "transaction": "0x4cb581281f7115706c5e6f669371574bfdea317325e15eef32cd356df0d4788b",
+                "index": 0,
+                "amount": "100"
+                }
+            }],
+            "outputs": [
+                {
+                "amount": "100",
+                "accounts": [self.test_account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+
+        address = self.node_addresses[0]['signer']
+        params = {
+            "seed": '', #account['spend_key'],
+            "key": json.dumps([address['view_key'] + address['spend_key']]),
+            "raw": json.dumps(trx),
+            "inputIndex": "0"
+        }
+        r = self.api.sign_transaction(params)
+        r = await self.api.send_transaction(r['raw'])
+        logger.info('deposit hash %s', r['hash'])
+        self.deposit_hash = r['hash']
+        return r['hash']
+
+    def stop(self, cleanup=True):
         for p in self.nodes:
             p.kill()
 
@@ -149,3 +200,6 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
                     shutil.rmtree(d)
                 self.config_dirs = None
         self.nodes = []
+
+    def __del__(self):
+        self.stop()
