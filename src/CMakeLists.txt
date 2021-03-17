@@ -16,6 +16,7 @@ target_include_directories(_mixin PRIVATE
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/mixin/libmixin.a
     COMMAND go build -o libmixin.a -buildmode=c-archive
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/mixin_api.go
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/main.go
     COMMENT "Creating libmixin.a"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/mixin
 )
