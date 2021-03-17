@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import shutil
 import tempfile
 import shlex, subprocess
@@ -26,7 +27,7 @@ class MixinTestnet(object):
             "signer": ""
             }
         ],
-        "epoch": 1615788541,
+        "epoch": int(time.time()),
         "nodes": []
         }
 
@@ -81,8 +82,7 @@ cache-ttl = 3600
 ring-cache-size = 4096
 ring-final-size = 16384
 [network]
-listener = "127.0.0.1:%s" 
-            '''%(self.node_addresses[i]['signer']['view_key'], port)
+listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], port)
 
             temp_dir = os.path.join('testnet', f'config-{port}')
             os.mkdir(temp_dir)
