@@ -50,7 +50,7 @@ class TestMixinApi(object):
         for i in range(7):
             port = 7001+i
             # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
-            cmd = f'mixin kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)
             p = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -61,7 +61,7 @@ class TestMixinApi(object):
         loop = asyncio.get_event_loop()        
         async def wait():
             api = MixinApi('http://127.0.0.1:8007')
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(3.0)
             while True:
                 try:
                     await cls.api.get_info()
@@ -139,7 +139,7 @@ class TestMixinApi(object):
             'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
             'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
         }
-
+        logger.info("+++++++++++++++deposit++++++++++++++++++++")
         trx = {
             "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
             "inputs": [{
@@ -160,8 +160,8 @@ class TestMixinApi(object):
                 }
             ]
         }
-        logger.info(trx)
-        logger.info(view_key + signer_key)
+        # logger.info(trx)
+        # logger.info(view_key + signer_key)
         # sign transaction with doman signer key
         params = {
             "seed": '', #account['spend_key'],
@@ -170,9 +170,9 @@ class TestMixinApi(object):
             "inputIndex": "0"
         }
         r = self.api.sign_transaction(params)
-        logger.info(r)
+        # logger.info(r)
         r = await self.api.send_transaction(r['raw'])
-        logger.info(r)
+        # logger.info(r)
         deposit_hash = r['hash']
 
 #        await asyncio.sleep(3.0)
@@ -181,8 +181,9 @@ class TestMixinApi(object):
             if r:
                 break
             await asyncio.sleep(0.5)
-        logger.info(r)
+        # logger.info(r)
 
+        logger.info("+++++++++++++++transfer++++++++++++++++++++")
         trx = {
             "asset": 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc',
             "inputs": [
@@ -207,7 +208,7 @@ class TestMixinApi(object):
             ]
         }
 
-        logger.info(trx)
+        # logger.info(trx)
         params = {
             "seed": '', #account['spend_key'],
             "key": json.dumps([account['view_key'] + account['spend_key']]),
@@ -216,11 +217,12 @@ class TestMixinApi(object):
         }
         r = await self.api.get_info()
 
+        await asyncio.sleep(2.0)
         for i in range(10):
             try:
                 r = self.api.sign_transaction(params)
-                logger.info(r)
-                r = await self.api.send_transaction(r['raw'])
+                # logger.info(r)
+                transfer_ret = await self.api.send_transaction(r['raw'])
                 break
             except Exception as e:
                 logger.info(e)
@@ -228,7 +230,58 @@ class TestMixinApi(object):
 
         else:
             raise Exception('transfer test failed!')
-        logger.info(r)
+        # logger.info(transfer_ret)
+
+        logger.info("+++++++++++++++withdraw++++++++++++++++++++")
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "extra": b"hello,world".hex(),
+            "inputs": [
+                {
+                "hash": transfer_ret['hash'],
+                "index": 0
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "50",
+                "withdrawal": {
+                    "chain": "8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27",
+                    "asset_key": "0xa974c709cfb4566686553a20790685a47aceaa33",
+                    "address": "0x62E2110D4F76e15Ae40FE1e139f249a1F1afd8b5",
+                    "tag":"hello,world"
+                },
+                "type": 161
+                },
+                {
+                "amount": "1",
+                "accounts": [
+                    account2['address']
+                ],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+
+        params = {
+            "seed": '', #account['spend_key'],
+            "key": json.dumps([account['view_key'] + account['spend_key']]),
+            "raw": json.dumps(trx),
+            "inputIndex": "0"
+        }
+
+        await asyncio.sleep(2.0)
+        for i in range(10):
+            try:
+                r = self.api.sign_transaction(params)
+                # logger.info(r)
+                transfer_ret = await self.api.send_transaction(r['raw'])
+                break
+            except Exception as e:
+                logger.info(e)
+                await asyncio.sleep(1.0)
+
 
     @pytest.mark.asyncio
     async def test_transfer(self):
