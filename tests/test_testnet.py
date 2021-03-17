@@ -177,7 +177,6 @@ class TestMixinApi(object):
         }
         r = await self.api.get_info()
 
-        await asyncio.sleep(2.0)
         for i in range(10):
             try:
                 r = self.api.sign_transaction(params)
