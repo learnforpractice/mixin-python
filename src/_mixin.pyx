@@ -5,7 +5,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.map cimport map
 from libcpp cimport bool
-from libc.stdlib cimport malloc
+from libc.stdlib cimport malloc, free
 
 
 cdef extern from * :
@@ -52,54 +52,92 @@ def main(_args):
 def init():
     Init()
 
+cdef object convert(char *_ret):
+    ret = <object>_ret
+    free(_ret)
+    return ret
+
 def create_address(char *params):
-    return CreateAddress(params)
+    cdef char *_ret
+    _ret =  CreateAddress(params)
+    return convert(_ret)
 
 def get_public_key(char* seed):
-    return GetPublicKey(seed)
+    cdef char *_ret
+    _ret = GetPublicKey(seed)
+    return convert(_ret)
 
 def decode_address(char* _address):
-    return DecodeAddress(_address)
+    cdef char *_ret
+    _ret = DecodeAddress(_address)
+    return convert(_ret)
 
 def decode_signature(char* signature):
-    return DecodeSignature(signature)
+    cdef char *_ret
+    _ret = DecodeSignature(signature)
+    return convert(_ret)
 
 def decrypt_ghost(char* ghostKey):
-    return DecryptGhost(ghostKey)
+    cdef char *_ret
+    _ret = DecryptGhost(ghostKey)
+    return convert(_ret)
 
 def decode_transaction(char* raw):
-    return DecodeTransaction(raw)
+    cdef char *_ret
+    _ret = DecodeTransaction(raw)
+    return convert(_ret)
 
 def encode_transaction(char* _params, char* signs):
-    return EncodeTransaction(_params, signs)
+    cdef char *_ret
+    _ret = EncodeTransaction(_params, signs)
+    return convert(_ret)
 
 def add_signatures_to_raw_transaction(char* raw, char* signs):
-    return AddSignaturesToRawTransaction(raw, signs)
+    cdef char *_ret
+    _ret = AddSignaturesToRawTransaction(raw, signs)
+    return convert(_ret)
 
 def build_raw_transaction(char* params):
-    return BuildRawTransaction(params)
+    cdef char *_ret
+    _ret = BuildRawTransaction(params)
+    return convert(_ret)
 
 def sign_raw_transaction(char* params):
-    return SignRawTransaction(params)
+    cdef char *_ret
+    _ret = SignRawTransaction(params)
+    return convert(_ret)
 
 def sign_transaction(char* params):
-    return SignTransaction(params)
+    cdef char *_ret
+    _ret = SignTransaction(params)
+    return convert(_ret)
 
 def pledge_node(char* params):
-    return PledgeNode(params)
+    cdef char *_ret
+    _ret = PledgeNode(params)
+    return convert(_ret)
 
 def cancel_node(char* params):
-    return CancelNode(params)
+    cdef char *_ret
+    _ret = CancelNode(params)
+    return convert(_ret)
 
 def decode_pledge_node(char* params):
-    return DecodePledgeNode(params)
+    cdef char *_ret
+    _ret = DecodePledgeNode(params)
+    return convert(_ret)
 
 def build_transaction_with_ghost_keys(char* assetId, char* ghostKeys, char* trxHash, char* outputAmount, char* memo, int outputIndex):
-    return BuildTransactionWithGhostKeys(assetId, ghostKeys, trxHash, outputAmount, memo, outputIndex)
+    cdef char *_ret
+    _ret = BuildTransactionWithGhostKeys(assetId, ghostKeys, trxHash, outputAmount, memo, outputIndex)
+    return convert(_ret)
 
 def sign_message(char* _key, char* _msg):
-    return SignMessage(_key, _msg)
+    cdef char *_ret
+    _ret = SignMessage(_key, _msg)
+    return convert(_ret)
 
 def verify_signature(char* _msg, char* _pub, char* _sig):
-    return VerifySignature(_msg, _pub, _sig)
-
+    cdef char *_ret
+    _ret = VerifySignature(_msg, _pub, _sig)
+    return convert(_ret)
