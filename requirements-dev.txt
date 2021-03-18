@@ -10,3 +10,5 @@ websockets
 scikit-build
 cython
 pytest
+pytest-asyncio
+
