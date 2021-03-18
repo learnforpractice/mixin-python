@@ -263,3 +263,17 @@ class MixinApi(object):
         if 'error' in ret:
             raise Exception(ret['error'])
         return ret['data']
+
+    def sign_message(self, key, msg):
+        ret = _mixin.sign_message(key, msg)
+        ret = json.loads(ret)
+        if 'error' in ret:
+            raise Exception(ret['error'])
+        return ret['data']
+
+    def verify_signature(self, msg, pub, sig):
+        ret = _mixin.verify_signature(msg, pub, sig)
+        ret = json.loads(ret)
+        if 'error' in ret:
+            raise Exception(ret['error'])
+        return ret['data']

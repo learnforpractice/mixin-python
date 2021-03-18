@@ -447,6 +447,20 @@ class TestMixinApi(object):
             raw = self.api.build_transaction_with_ghost_keys(cnb_asset_id, ghost_keys, trx_hash, output_amount, memo, output_index)
         logger.info(execinfo.value)
 
+    def test_signature(self):
+        # addr = self.api.create_address()
+        # spend_key = addr['spend_key']
+        # logger.info(spend_key)
+
+        spend_key = "a9d9e97b983bc1fbff5f4c89b8789918d45c9318b1edf460b4fa1a5c4177670b"
+
+        msg = 'hello,world'
+        signature = self.api.sign_message(spend_key, msg)
+        logger.info(signature)
+        pub_key = self.api.get_public_key(spend_key)
+        logger.info(pub_key)
+        assert self.api.verify_signature(msg, pub_key, signature)
+
     @pytest.mark.asyncio
     async def test_async(self):
         import httpx

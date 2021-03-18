@@ -40,6 +40,9 @@ cdef extern from "libmixin.h":
 
     char* SignRawTransaction(char* params)
 
+    char* SignMessage(char* _key, char* _msg);
+    char* VerifySignature(char* _msg, char* _pub, char* _sig);
+
 def main(_args):
     cdef char* args
     args = _args
@@ -93,4 +96,10 @@ def decode_pledge_node(char* params):
 
 def build_transaction_with_ghost_keys(char* assetId, char* ghostKeys, char* trxHash, char* outputAmount, char* memo, int outputIndex):
     return BuildTransactionWithGhostKeys(assetId, ghostKeys, trxHash, outputAmount, memo, outputIndex)
+
+def sign_message(char* _key, char* _msg):
+    return SignMessage(_key, _msg)
+
+def verify_signature(char* _msg, char* _pub, char* _sig):
+    return VerifySignature(_msg, _pub, _sig)
 
