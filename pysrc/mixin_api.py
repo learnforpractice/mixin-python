@@ -75,6 +75,7 @@ class MixinApi(object):
         return ret['data']
 
     def decode_ghost_key(self, key):
+        key = json.dumps(key)
         ret = _mixin.decrypt_ghost(key)
         ret = json.loads(ret)
         if 'error' in ret:

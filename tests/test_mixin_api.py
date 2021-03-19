@@ -462,15 +462,59 @@ class TestMixinApi(object):
         assert self.api.verify_signature(msg, pub_key, signature)
 
     def test_asset_id(self):
+        #XIN asset id
         asset = {
             'chain_id':'8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27',
             'asset_key':'0xa974c709cfb4566686553a20790685a47aceaa33'
         }
         ret = self.api.get_asset_id(asset)
+        logger.info(ret)
         assert ret == 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc'
 
-        ret = self.api.get_fee_asset_id(asset)
+        #ETH asset id
+        asset = {
+            'chain_id':'8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27',
+            'asset_key':'0x0000000000000000000000000000000000000000'
+        }
+        ret = self.api.get_asset_id(asset)
+        logger.info(ret)
         assert ret == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+
+        ret = self.api.get_fee_asset_id(asset)
+        logger.info(ret)
+        assert ret == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+
+        # EOS asset id
+        asset = {
+            'chain_id':'6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d',
+            'asset_key':"eosio.token:EOS"
+        }
+        ret = self.api.get_asset_id(asset)
+        logger.info('EOS asset id: %s', ret)
+        assert ret == '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
+
+        #EOS USDT asset id
+        asset = {
+            'chain_id':'6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d',
+            'asset_key':"tethertether:USDT"
+        }
+        ret = self.api.get_asset_id(asset)
+        logger.info('USDT asset id:%s', ret)
+
+    def test_decode_host_key(self):
+        # view, err := crypto.KeyFromString(ghostKey["view"])
+        # key, err := crypto.KeyFromString(ghostKey["key"])
+        # mask, err := crypto.KeyFromString(ghostKey["mask"])
+        # n, err := strconv.ParseUint(ghostKey["index"], 10, 64)
+        params = {
+            'view':'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
+            'key':'961cd15051274f6d896750c69e44c5ff9bca27e81691667ee344e953b3255601',
+            'mask':'a56db149223a6872ee35d8c7bb0dfef140669913119ffe56a7f06a18a309a61b',
+            'index':'0'
+        }
+        ret = self.api.decode_ghost_key(params)
+        logger.info(ret)
+        assert ret == 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm'
 
     @pytest.mark.asyncio
     async def test_async(self):
