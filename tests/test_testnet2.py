@@ -16,6 +16,7 @@ import threading
 import shlex
 import signal
 import shutil
+import pprint
 import subprocess
 from io import BytesIO
 
@@ -53,6 +54,7 @@ class TestMixinApi(object):
             port = 7001+i
             # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            # cmd = f'/Users/newworld/dev/mixin/mixin/mixin kernel -dir /tmp/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)
             log = open(f'/tmp/mixin-700{i+1}/log.txt', 'a')
@@ -184,6 +186,7 @@ class TestMixinApi(object):
             if r:
                 break
             await asyncio.sleep(0.5)
+            logger.info('sleep a while...')
         # logger.info(r)
 
         logger.info("+++++++++++++++transfer++++++++++++++++++++")
@@ -339,6 +342,61 @@ class TestMixinApi(object):
         logger.info(r)
 
     @pytest.mark.asyncio
+    async def test_get_info(self):
+        r = await self.api.get_info()
+        logger.info(r)
+
+    @pytest.mark.asyncio
+    async def test_list_all_nodes(self):
+        info = await self.api.list_all_nodes(0, True)
+        logger.info(info)
+
+    @pytest.mark.asyncio
+    async def test_get_utxo(self):
+        info = await self.api.list_all_nodes(0, True)
+        logger.info(info)
+        hash = info[0]['transaction']
+        utxo = await self.api.get_utxo(hash, 0)
+        logger.info(utxo)
+
+    @pytest.mark.asyncio
+    async def test_get_snapshot(self):
+        info = await self.api.list_all_nodes(0, True)
+        logger.info(info)
+        hash = info[0]['transaction']
+        r = await self.api.get_transaction(hash)
+        logger.info(r)
+        snapshot = await self.api.get_snapshot(r['snapshot'])
+        logger.info(snapshot)
+
+    @pytest.mark.asyncio
+    async def test_list_mint_works(self):
+        info = await self.api.list_mint_works(0)
+        logger.info(info)
+
+        info = await self.api.list_mint_works(1)
+        logger.info(info)
+
+    @pytest.mark.asyncio
+    async def test_list_mint_distributions(self):
+        info = await self.api.list_mint_distributions(0, 5, True)
+        logger.info(info)
+
+        info = await self.api.list_mint_distributions(1, 5, False)
+        logger.info(info)
+
+    @pytest.mark.asyncio
+    async def test_get_round_by_number(self):
+        r = await self.api.get_info()
+        # logger.info(r)
+        node = r['graph']['consensus'][0]['node']
+        info = await self.api.get_round_by_number(node, 0)
+        logger.info(info)
+
+        info = await self.api.get_round_by_number(node, 1)
+        logger.info(info)
+
+    @pytest.mark.asyncio
     async def test_repeat_transfer(self):
         async def monitor():
             for i in range(7):
@@ -409,7 +467,7 @@ class TestMixinApi(object):
         # logger.info(view_key + signer_key)
         # sign transaction with doman signer key
         params = {
-            "seed": '', #account['spend_key'],
+            "seed": 'a'*64*2, #account['spend_key'],
             "key": json.dumps([view_key + signer_key,]),
             "raw": json.dumps(trx),
             "inputIndex": "0"
@@ -423,13 +481,13 @@ class TestMixinApi(object):
 #        await asyncio.sleep(3.0)
         while True:
             r = await self.api.get_transaction(deposit_hash)
-            if r:
+            if r and 'snapshot' in r:
                 break
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.2)
         # logger.info(r)
 
         input_hash = deposit_hash
-        for i in range(20):
+        for i in range(300):
             logger.info(f"+++++++++++++++transfer++++++++++++++++++++{i}")
             trx = {
                 "asset": 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc',
@@ -457,7 +515,6 @@ class TestMixinApi(object):
             r = await self.api.get_info()
 
             for i in range(20):
-                await asyncio.sleep(0.5)
                 i = random.randint(1, 7)
                 # logger.info(i)
                 self.api.set_node(f'http://127.0.0.1:800{i}')
@@ -470,6 +527,7 @@ class TestMixinApi(object):
                     break
                 except Exception as e:
                     logger.info(e)
+                    await asyncio.sleep(0.1)
             else:
                 raise Exception('transfer failed!')
 
@@ -482,6 +540,9 @@ class TestMixinApi(object):
                         await asyncio.sleep(0.1)
                         continue
                     if 'snapshot' in r:
+                        logger.info(r)
+                        r = await self.api.get_snapshot(r['snapshot'])
+                        logger.info(r)
                         break
                 except Exception as e:
                     logger.info(e)

@@ -220,6 +220,69 @@ class MixinApi(object):
             raise Exception(r['error'])
         return r['data']
 
+    async def list_all_nodes(self, threshold, state):
+        data = {'method': 'listallnodes', 'params': [threshold, state]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def get_utxo(self, hash, index):
+        data = {'method': 'getutxo', 'params': [hash, index]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def get_cache_transaction(self, _hash):
+        data = {'method': 'getcachetransaction', 'params': [_hash]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def get_snapshot(self, _hash):
+        data = {'method': 'getsnapshot', 'params': [_hash]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def list_mint_works(self, offset):
+        data = {'method': 'listmintworks', 'params': [offset]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def list_mint_distributions(self, offset, count, tx):
+        data = {'method': 'listmintdistributions', 'params': [offset, count, tx]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def get_round_by_number(self, node, num):
+        data = {'method': 'getroundbynumber', 'params': [node, num]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
     async def send_transaction(self, raw):
         data = {'method': 'sendrawtransaction', 'params': [raw]}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
