@@ -461,6 +461,17 @@ class TestMixinApi(object):
         logger.info(pub_key)
         assert self.api.verify_signature(msg, pub_key, signature)
 
+    def test_asset_id(self):
+        asset = {
+            'chain_id':'8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27',
+            'asset_key':'0xa974c709cfb4566686553a20790685a47aceaa33'
+        }
+        ret = self.api.get_asset_id(asset)
+        assert ret == 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc'
+
+        ret = self.api.get_fee_asset_id(asset)
+        assert ret == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+
     @pytest.mark.asyncio
     async def test_async(self):
         import httpx

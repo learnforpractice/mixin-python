@@ -42,6 +42,8 @@ cdef extern from "libmixin.h":
 
     char* SignMessage(char* _key, char* _msg);
     char* VerifySignature(char* _msg, char* _pub, char* _sig);
+    char* GetAssetId(char* asset);
+    char* GetFeeAssetId(char* asset);
 
 def main(_args):
     cdef char* args
@@ -141,3 +143,14 @@ def verify_signature(char* _msg, char* _pub, char* _sig):
     cdef char *_ret
     _ret = VerifySignature(_msg, _pub, _sig)
     return convert(_ret)
+
+def get_asset_id(char *asset):
+    cdef char *ret
+    ret = GetAssetId(asset)
+    return convert(ret)
+
+def get_fee_asset_id(char *asset):
+    cdef char *ret
+    ret = GetFeeAssetId(asset)
+    return convert(ret)
+

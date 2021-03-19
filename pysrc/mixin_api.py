@@ -277,3 +277,19 @@ class MixinApi(object):
         if 'error' in ret:
             raise Exception(ret['error'])
         return ret['data']
+
+    def get_asset_id(self, asset):
+        asset = json.dumps(asset)
+        ret = _mixin.get_asset_id(asset)
+        ret = json.loads(ret)
+        if 'error' in ret:
+            raise Exception(ret['error'])
+        return ret['data']
+
+    def get_fee_asset_id(self, asset):
+        asset = json.dumps(asset)
+        ret = _mixin.get_fee_asset_id(asset)
+        ret = json.loads(ret)
+        if 'error' in ret:
+            raise Exception(ret['error'])
+        return ret['data']
