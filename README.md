@@ -27,13 +27,13 @@ python3 -m pip install -r requirements-dev.txt
 Linux
 
 ```
-./build_linux.sh
+./build-linux.sh
 ```
 
 macOS X
 
 ```
-./build_mac.sh
+./build-mac.sh
 ```
 
 # Installation
