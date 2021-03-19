@@ -12,13 +12,14 @@ logger = log.get_logger(__name__)
 
 class MixinTestnet(object):
 
-    def __init__(self):
+    def __init__(self, node_count=7):
         self.api = MixinApi('http://127.0.0.1:8001')
         self.genesis = None
         self.node_addresses = None
         self.config_dirs = None
         self.deposit_hash = None
         self.nodes = []
+        self.node_count = node_count
 
         self.test_account = {
             'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
@@ -45,7 +46,7 @@ class MixinTestnet(object):
         }
 
         node_addresses = []
-        for i in range(7):
+        for i in range(self.node_count):
             payee = self.api.create_address(public=True)
             signer = self.api.create_address(public=True)
             args = {
@@ -56,7 +57,7 @@ class MixinTestnet(object):
 
         genesis['domains'][0]['signer'] = node_addresses[0]['signer']['address']
 
-        for i in range(7):
+        for i in range(self.node_count):
             node = {
             "balance": "10000",
             "payee": node_addresses[i]['payee']['address'],
@@ -71,7 +72,7 @@ class MixinTestnet(object):
 
         genesis = json.dumps(self.genesis, indent=' ')
         nodes = []
-        for i in range(7):
+        for i in range(self.node_count):
             port = 7001+i
             node = {
                 "host": f"127.0.0.1:{port}",
@@ -84,7 +85,7 @@ class MixinTestnet(object):
         self.config_dirs = []
         if not os.path.exists('testnet'):
             os.mkdir('testnet')
-        for i in range(7):
+        for i in range(self.node_count):
             port = 7001+i
             config = '''
 [node]
@@ -126,7 +127,7 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
         if self.nodes:
             raise Exception('testnet is running')
 
-        for i in range(7):
+        for i in range(self.node_count):
             port = 7001+i
             config_dir = self.config_dirs[i]
             cmd = f'python3 -m mixin.main kernel -dir {config_dir} -port {port}'
