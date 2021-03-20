@@ -392,6 +392,7 @@ class TestMixinApi(object):
 
         r = self.api.decode_transaction(r)
         logger.info(r)
+
     def test_add_signatures_to_raw_transaction(self):
 
         self.api.add_signatures_to_raw_transaction()
@@ -536,6 +537,32 @@ class TestMixinApi(object):
         ret = self.api.decode_ghost_key(params)
         logger.info(ret)
         assert ret == 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm'
+
+    def test_benchmark_batch_verify(self, benchmark):
+        private_keys = []
+        public_keys = []
+        signatures = []
+
+        N=64
+        for i in range(N):
+            addr = self.api.create_address()
+            spend_key = addr['spend_key']
+            private_keys.append(spend_key)
+            pub_key = self.api.get_public_key(spend_key)
+            public_keys.append(bytes.fromhex(pub_key))
+
+        msg = 'hello,world'
+        for i in range(N):
+            spend_key = private_keys[i]
+            signature = self.api.sign_message(spend_key, msg)
+            signature = bytes.fromhex(signature)
+            signatures.append(signature)
+
+        @benchmark
+        def bench():
+            ret = self.api.batch_verify(msg, public_keys, signatures)
+            # time.sleep(0.1)
+            # logger.info(ret)
 
     @pytest.mark.asyncio
     async def test_async(self):
