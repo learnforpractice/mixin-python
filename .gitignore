@@ -1,3 +1,4 @@
+*.wallet
 testnet
 testnet.json
 cp.sh
