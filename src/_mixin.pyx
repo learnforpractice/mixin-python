@@ -1,6 +1,7 @@
-# cython: c_string_type=str, c_string_encoding=ascii
+# cython: c_string_type=str, c_string_encoding=utf8
 
 from cython.operator cimport dereference as deref, preincrement as inc
+from cpython.bytes cimport PyBytes_AS_STRING
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.map cimport map
@@ -17,9 +18,9 @@ cdef extern from "<Python.h>":
     object PyBytes_FromStringAndSize(const char* str, int size)
     int _PyLong_AsByteArray(PyLongObject* v, unsigned char* bytes, size_t n, int little_endian, int is_signed)
 
-cdef extern from "libmixin.h":
+cdef extern from "libmixin.h" nogil:
     void Init();
-    int MixinMain(char* args) nogil
+    int MixinMain(char* args)
     char* CreateAddress(char* _params);
     char* GetPublicKey(char* seed);
 
@@ -44,6 +45,7 @@ cdef extern from "libmixin.h":
     char* VerifySignature(char* _msg, char* _pub, char* _sig);
     char* GetAssetId(char* asset);
     char* GetFeeAssetId(char* asset);
+    bool BatchVerify(char* msg, int msg_size, char** keys, int keys_size, char** sigs, int sigs_size);
 
 def main(_args):
     cdef char* args
@@ -154,3 +156,22 @@ def get_fee_asset_id(char *asset):
     ret = GetFeeAssetId(asset)
     return convert(ret)
 
+def batch_verify(msg, keys, sigs):
+    cdef char **_keys
+    cdef char **_sigs
+    if not len(keys) == len(sigs):
+        raise Exception('keys and signature size not the same')
+    for i in range(len(keys)):
+        if not len(keys[i]) == 32:
+            raise Exception('bad key size')
+        if not len(sigs[i]) == 64:
+            raise Exception('bad signature size')
+    _keys = <char **>malloc(sizeof(char **) * len(keys))
+    _sigs = <char **>malloc(sizeof(char **) * len(sigs))
+    for i in range(len(keys)):
+        _keys[i] = PyBytes_AS_STRING(keys[i])
+        _sigs[i] = PyBytes_AS_STRING(sigs[i])
+    ret = BatchVerify(msg, len(msg), _keys, len(keys), _sigs, len(sigs))
+    free(<void *>_keys)
+    free(<void *>_sigs)
+    return ret

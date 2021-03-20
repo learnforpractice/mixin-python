@@ -461,6 +461,27 @@ class TestMixinApi(object):
         logger.info(pub_key)
         assert self.api.verify_signature(msg, pub_key, signature)
 
+    def test_batch_verify(self):
+        spend_key = "a9d9e97b983bc1fbff5f4c89b8789918d45c9318b1edf460b4fa1a5c4177670b"
+        spend_key2 = "7ae37024eb14d00162f66e290649dbafb2abe4ee67a6190b63854f10a706dc0e"
+
+        msg = 'hello,world'
+        signature = self.api.sign_message(spend_key, msg)
+        pub_key = self.api.get_public_key(spend_key)
+        pub_key = bytes.fromhex(pub_key)
+        signature = bytes.fromhex(signature)
+
+        # ret = self.api.batch_verify(msg, [pub_key], [signature])
+        # logger.info(ret)
+
+        signature2 = self.api.sign_message(spend_key2, msg)
+        pub_key2 = self.api.get_public_key(spend_key2)
+        pub_key2 = bytes.fromhex(pub_key2)
+        signature2 = bytes.fromhex(signature2)
+
+        ret = self.api.batch_verify(msg, [pub_key, pub_key2], [signature, signature2])
+        logger.info(ret)
+
     def test_asset_id(self):
         #XIN asset id
         asset = {

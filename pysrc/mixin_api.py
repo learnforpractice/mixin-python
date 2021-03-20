@@ -342,6 +342,9 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
+    def batch_verify(self, msg, keys, sigs):
+        return _mixin.batch_verify(msg, keys, sigs)
+
     def get_asset_id(self, asset):
         asset = json.dumps(asset)
         ret = _mixin.get_asset_id(asset)
