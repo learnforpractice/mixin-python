@@ -180,14 +180,7 @@ class TestMixinApi(object):
         # logger.info(r)
         deposit_hash = r['hash']
 
-#        await asyncio.sleep(3.0)
-        while True:
-            r = await self.api.get_transaction(deposit_hash)
-            if r:
-                break
-            await asyncio.sleep(0.5)
-            logger.info('sleep a while...')
-        # logger.info(r)
+        await self.wait_for_transaction(deposit_hash)
 
         logger.info("+++++++++++++++transfer++++++++++++++++++++")
         trx = {
@@ -223,20 +216,7 @@ class TestMixinApi(object):
         }
         r = await self.api.get_info()
 
-        await asyncio.sleep(2.0)
-        for i in range(10):
-            try:
-                r = self.api.sign_transaction(params)
-                # logger.info(r)
-                transfer_ret = await self.api.send_transaction(r['raw'])
-                break
-            except Exception as e:
-                logger.info(e)
-                await asyncio.sleep(1.0)
-
-        else:
-            raise Exception('transfer test failed!')
-        # logger.info(transfer_ret)
+        trx_hash = await self.send_transaction(params)
 
         logger.info("+++++++++++++++withdraw++++++++++++++++++++")
         trx = {
@@ -244,7 +224,7 @@ class TestMixinApi(object):
             "extra": b"hello,world".hex(),
             "inputs": [
                 {
-                "hash": transfer_ret['hash'],
+                "hash": trx_hash,
                 "index": 0
                 }
             ],
@@ -276,18 +256,7 @@ class TestMixinApi(object):
             "raw": json.dumps(trx),
             "inputIndex": "0"
         }
-
-        await asyncio.sleep(2.0)
-        for i in range(10):
-            try:
-                r = self.api.sign_transaction(params)
-                # logger.info(r)
-                transfer_ret = await self.api.send_transaction(r['raw'])
-                break
-            except Exception as e:
-                logger.info(e)
-                await asyncio.sleep(1.0)
-
+        await self.send_transaction(params)
 
     @pytest.mark.asyncio
     async def test_transfer(self):
@@ -477,17 +446,11 @@ class TestMixinApi(object):
         r = await self.api.send_transaction(r['raw'])
         # logger.info(r)
         deposit_hash = r['hash']
-
-#        await asyncio.sleep(3.0)
-        while True:
-            r = await self.api.get_transaction(deposit_hash)
-            if r and 'snapshot' in r:
-                break
-            await asyncio.sleep(0.2)
-        # logger.info(r)
+        
+        await self.wait_for_transaction(deposit_hash)
 
         input_hash = deposit_hash
-        for i in range(300):
+        for i in range(30):
             logger.info(f"+++++++++++++++transfer++++++++++++++++++++{i}")
             trx = {
                 "asset": 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc',
@@ -514,42 +477,26 @@ class TestMixinApi(object):
             }
             r = await self.api.get_info()
 
-            for i in range(20):
-                i = random.randint(1, 7)
-                # logger.info(i)
-                self.api.set_node(f'http://127.0.0.1:800{i}')
-                # self.api.set_node(f'http://127.0.0.1:8007')
-                try:
-                    r = self.api.sign_transaction(params)
-                    # logger.info(r)
-                    transfer_ret = await self.api.send_transaction(r['raw'])
-                    input_hash = transfer_ret['hash']
-                    break
-                except Exception as e:
-                    logger.info(e)
-                    await asyncio.sleep(0.1)
-            else:
-                raise Exception('transfer failed!')
+            input_hash = await self.send_transaction(params)
+            await self.wait_for_transaction(input_hash)
 
-            node_index = 1
-            while True:
-                self.api.set_node(f'http://127.0.0.1:800{node_index}')
-                try:
-                    r = await self.api.get_transaction(transfer_ret['hash'])
-                    if not r:
-                        await asyncio.sleep(0.1)
-                        continue
-                    if 'snapshot' in r:
-                        logger.info(r)
-                        r = await self.api.get_snapshot(r['snapshot'])
-                        logger.info(r)
-                        break
-                except Exception as e:
-                    logger.info(e)
-                    await asyncio.sleep(0.1)
-                node_index += 1
-                if node_index > 7:
-                    node_index = 1
+    async def send_transaction(self, params):
+        for i in range(5):
+            i = random.randint(1, 7)
+            # logger.info(i)
+            self.api.set_node(f'http://127.0.0.1:800{i}')
+            # self.api.set_node(f'http://127.0.0.1:8007')
+            try:
+                r = self.api.sign_transaction(params)
+                # logger.info(r)
+                ret = await self.api.send_transaction(r['raw'])
+                return ret['hash']
+                break
+            except Exception as e:
+                logger.info(e)
+                await asyncio.sleep(0.4)
+        else:
+            raise Exception('transfer failed!')
 
     async def wait_for_transaction(self, _hash):
         node_index = 1
@@ -697,23 +644,7 @@ class TestMixinApi(object):
         }
         r = await self.api.get_info()
 
-        for i in range(20):
-            i = random.randint(1, 7)
-            # logger.info(i)
-            self.api.set_node(f'http://127.0.0.1:800{i}')
-            # self.api.set_node(f'http://127.0.0.1:8007')
-            try:
-                r = self.api.sign_transaction(params)
-                # logger.info(r)
-                transfer_ret = await self.api.send_transaction(r['raw'])
-                input_hash = transfer_ret['hash']
-                break
-            except Exception as e:
-                logger.info(e)
-                await asyncio.sleep(0.1)
-        else:
-            raise Exception('transfer failed!')
-
+        input_hash = await self.send_transaction(params)
         await self.wait_for_transaction(input_hash)
 
         trx = {
