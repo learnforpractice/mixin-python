@@ -11,4 +11,4 @@ scikit-build
 cython
 pytest
 pytest-asyncio
-
+pytest-benchmark==3.2.3
