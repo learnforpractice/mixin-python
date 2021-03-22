@@ -394,7 +394,6 @@ class MixinApi(object):
             'asset_key': asset_key
         }
         asset = json.dumps(asset)
-        print(asset)
         ret = _mixin.get_asset_id(asset)
         ret = json.loads(ret)
         if 'error' in ret:

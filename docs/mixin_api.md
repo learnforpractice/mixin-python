@@ -199,7 +199,7 @@ def get_asset_id(self, chain_id, asset_key)
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
 chain_id = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
 contract_address = '0xa974c709cfb4566686553a20790685a47aceaa33'
-ret = api.get_asset_id(contract_address)
+ret = api.get_asset_id(chain_id, contract_address)
 print(ret)
 ```
 
@@ -211,7 +211,7 @@ def get_eth_asset_id(self, contract_address)
 ```python
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
 contract_address = '0xa974c709cfb4566686553a20790685a47aceaa33'
-ret = api.get_asset_id(contract_address)
+ret = api.get_eth_asset_id(contract_address)
 print(ret)
 #output: a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc
 ```
@@ -224,7 +224,7 @@ def get_eos_asset_id(self, contract, symbol)
 
 ```python
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
-ret = self.api.get_eos_asset_id('eosio.token', 'EOS')
+ret = api.get_eos_asset_id('eosio.token', 'EOS')
 print(ret)
 # output : 6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d
 ```
