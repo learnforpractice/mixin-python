@@ -2,10 +2,13 @@ import os
 import json
 import time
 import asyncio
+import signal
 import shutil
 import tempfile
 import requests
 import shlex, subprocess
+from subprocess import Popen, PIPE
+
 
 from .mixin_api import MixinApi
 from . import log
@@ -34,6 +37,21 @@ class MixinTestnet(object):
             'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
             'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
         }
+
+    def kill_all_nodes(self):
+        for port in range(8001, 8008):
+            self.kill_node(port)
+
+    def kill_node(self, port):
+        process = subprocess.Popen(["lsof", "-i", ":{0}".format(port)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        for process in stdout.decode("utf-8").split("\n")[1:]:
+            if not '(LISTEN)' in process:
+                continue
+            data = [x for x in process.split(" ") if x != '']
+            if (len(data) <= 1):
+                continue
+            os.kill(int(data[1]), signal.SIGKILL)
 
     def create_test_genesis(self):
         genesis = {
@@ -151,7 +169,18 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
                 print(e)
                 time.sleep(0.5)
 
-    def start(self):
+    def remove_all_config_dirs(self):
+        self.config_dirs = []
+        for port in range(7001, 7008):
+            temp_dir = os.path.join('testnet', f'config-{port}')
+            self.config_dirs.append(temp_dir)
+        self.cleanup()
+
+    def start(self, new_testnet=True):
+        if new_testnet:
+            self.kill_all_nodes()
+            self.remove_all_config_dirs()
+
         if os.path.exists('testnet/testnet.json'):
             return self.restart('testnet/testnet.json')
         self._create()
@@ -198,19 +227,25 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
         self.deposit_hash = r['hash']
         return r['hash']
 
+    def cleanup(self):
+        if os.path.exists('testnet/testnet.json'):
+            os.remove('testnet/testnet.json')
+
+        if self.config_dirs:
+            for d in self.config_dirs:
+                if os.path.exists(d):
+                    shutil.rmtree(d)
+            self.config_dirs = None
+    
     def stop(self, cleanup=True):
         for p in self.nodes:
             p.kill()
-
-        if cleanup:
-            if os.path.exists('testnet/testnet.json'):
-                os.remove('testnet/testnet.json')
- 
-            if self.config_dirs:
-                for d in self.config_dirs:
-                    shutil.rmtree(d)
-                self.config_dirs = None
         self.nodes = []
+
+        if not cleanup:
+            return
+
+        self.cleanup()
 
     def __del__(self):
         self.stop()
