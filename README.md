@@ -19,7 +19,7 @@
 
 clang & go 1.16 & cmake
 
-## Ubuntu
+Ubuntu
 ```
 sudo apt install python3-dev
 sudo apt install python3-pip
@@ -40,20 +40,20 @@ cd mixin-python
 python3 -m pip install -r requirements-dev.txt 
 ```
 
-### Update mixin-python source code
+### Update mixin-python Source Code
 
 ```bash
 git pull
 git submodule update --init --recursive
 ```
 
-Linux
+### Build on Linux
 
 ```
 ./build-linux.sh
 ```
 
-macOS X
+### Build on macOS X
 
 ```
 ./build-mac.sh
@@ -65,7 +65,7 @@ macOS X
 python3 -m pip install dist/mixin-0.1.0-*
 ```
 
-## Install from prebuild package
+## Install from Prebuild Package
 
 Ubuntu python3.7
 ```bash
@@ -100,7 +100,7 @@ api.create_address()
 api.get_info()
 ```
 
-# Run mixin from Python
+# Run Mixin from Python
 
 ```bash
 python3 -m mixin.main kernel --dir config --port 9000
@@ -112,7 +112,7 @@ python3 -m mixin.main kernel --dir config --port 9000
 python3 tests/start_testnet.py
 ```
 
-# Run tests in jupyter notebook
+# Run Tests in Jupyter Notebook
 ```bash
 python3 -m pip install notebook
 cd notebook

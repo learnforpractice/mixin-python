@@ -1,6 +1,4 @@
-# Python Bindings for [ Mixin](https://github.com/mixinNetwork/mixin)
-
-
+# Python Bindings for [Mixin](https://github.com/mixinNetwork/mixin)
 <h3>
   <a
     target="_blank"
@@ -13,6 +11,7 @@
   </a>
 </h3>
 
+# [Releases](https://github.com/learnforpractice/mixin-python/releases/tag/v0.1)
 
 
 
@@ -33,19 +32,28 @@ sudo apt install cmake
 
 # Building
 
+### Download source code
+
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
 cd mixin-python
 python3 -m pip install -r requirements-dev.txt 
 ```
 
-Linux
+### Update mixin-python Source Code
+
+```bash
+git pull
+git submodule update --init --recursive
+```
+
+### Build on Linux
 
 ```
 ./build-linux.sh
 ```
 
-macOS X
+### Build on macOS X
 
 ```
 ./build-mac.sh
@@ -57,7 +65,7 @@ macOS X
 python3 -m pip install dist/mixin-0.1.0-*
 ```
 
-### Install from prebuild package
+## Install from Prebuild Package
 
 Ubuntu python3.7
 ```bash
@@ -92,7 +100,7 @@ api.create_address()
 api.get_info()
 ```
 
-# Run mixin from Python
+# Run Mixin from Python
 
 ```bash
 python3 -m mixin.main kernel --dir config --port 9000
@@ -104,7 +112,7 @@ python3 -m mixin.main kernel --dir config --port 9000
 python3 tests/start_testnet.py
 ```
 
-# Run tests in jupyter notebook
+# Run Tests in Jupyter Notebook
 ```bash
 python3 -m pip install notebook
 cd notebook

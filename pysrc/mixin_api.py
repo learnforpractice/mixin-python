@@ -47,7 +47,7 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
-    def get_public_key(self, seed):
+    def get_public_key(self, private_key):
         ret = _mixin.get_public_key(seed)
         ret = json.loads(ret)
         if 'error' in ret:
