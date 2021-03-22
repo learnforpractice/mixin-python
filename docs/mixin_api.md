@@ -36,6 +36,7 @@ api = MixinApi('http://127.0.0.1:8001')
 testnet = MixinTestnet()
 testnet.start()
 deposit_hash = await testnet.deposit()
+await api.wait_for_transaction(deposit_hash)
 
 account = {
     'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
@@ -84,6 +85,7 @@ api = MixinApi('http://127.0.0.1:8001')
 testnet = MixinTestnet()
 testnet.start()
 deposit_hash = await testnet.deposit()
+await api.wait_for_transaction(deposit_hash)
 
 account = {
     'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
@@ -109,7 +111,7 @@ trx = {
     ]
 }
 
-ret = await api.sign_transaction(trx, [account], 0)
+ret = api.sign_transaction(trx, [account], 0)
 print(ret['raw'])
 print(ret['signatures'])
 ret = await api.send_raw_transaction(ret['raw'])
@@ -133,6 +135,7 @@ api = MixinApi('http://127.0.0.1:8001')
 testnet = MixinTestnet()
 testnet.start()
 deposit_hash = await testnet.deposit()
+await api.wait_for_transaction(deposit_hash)
 
 account = {
     'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
@@ -160,7 +163,6 @@ trx = {
 
 ret = await api.send_transaction(trx, [account], 0)
 print(ret['hash'])
-
 
 testnet.stop()
 
