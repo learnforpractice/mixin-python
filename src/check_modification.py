@@ -5,6 +5,8 @@ root_path = sys.argv[1]
 
 def check_modification():   
     lib_name = os.path.join(root_path, 'libmixin.a')
+    if not os.path.exists(lib_name):
+        return True
     modify_time = os.path.getmtime(lib_name)
     for root, dirs, files in os.walk(root_path):
         for f in files:
