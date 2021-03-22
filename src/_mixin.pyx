@@ -46,6 +46,7 @@ cdef extern from "libmixin.h" nogil:
     char* GetAssetId(char* asset);
     char* GetFeeAssetId(char* asset);
     bool BatchVerify(char* msg, int msg_size, char** keys, int keys_size, char** sigs, int sigs_size);
+    char* NewGhostKeys(char* seed, char* accounts, int outputs);
 
 def main(_args):
     cdef char* args
@@ -175,3 +176,7 @@ def batch_verify(msg, keys, sigs):
     free(<void *>_keys)
     free(<void *>_sigs)
     return ret
+
+def new_ghost_keys(char *seed, char* accounts, int outputs):
+    return NewGhostKeys(seed, accounts, outputs)
+
