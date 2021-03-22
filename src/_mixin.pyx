@@ -20,6 +20,7 @@ cdef extern from "<Python.h>":
 
 cdef extern from "libmixin.h" nogil:
     void Init();
+    char* GetMixinVersion()
     int MixinMain(char* args)
     char* CreateAddress(char* _params);
     char* GetPublicKey(char* seed);
@@ -48,6 +49,12 @@ cdef extern from "libmixin.h" nogil:
     bool BatchVerify(char* msg, int msg_size, char** keys, int keys_size, char** sigs, int sigs_size);
     char* NewGhostKeys(char* seed, char* accounts, int outputs);
 
+
+cdef object convert(char *_ret):
+    ret = <object>_ret
+    free(_ret)
+    return ret
+
 def main(_args):
     cdef char* args
     args = _args
@@ -57,10 +64,10 @@ def main(_args):
 def init():
     Init()
 
-cdef object convert(char *_ret):
-    ret = <object>_ret
-    free(_ret)
-    return ret
+def get_mixin_version():
+    cdef char* ret
+    ret = GetMixinVersion()
+    return convert(ret)
 
 def create_address(char *params):
     cdef char *_ret

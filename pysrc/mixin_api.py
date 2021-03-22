@@ -36,6 +36,9 @@ class MixinApi(object):
     def set_node(self, url):
         self.node_url = url
 
+    def get_mixin_version(self):
+        return _mixin.get_mixin_version()
+
     def create_address(self, spend_key="", view_key="", public=False):
         params = {
             "view_key": view_key,
