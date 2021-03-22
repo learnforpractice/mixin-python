@@ -1,4 +1,4 @@
-# Python Bindings for [Mixin](https://github.com/mixinNetwork/mixin)
+# Python Bindings for [ Mixin](https://github.com/mixinNetwork/mixin)
 <h3>
   <a
     target="_blank"

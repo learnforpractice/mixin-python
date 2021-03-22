@@ -32,7 +32,7 @@ sudo apt install cmake
 
 # Building
 
-### Download source code
+### Download Source Code
 
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
