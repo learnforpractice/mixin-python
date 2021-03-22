@@ -30,12 +30,21 @@ sudo apt install cmake
 [Intall golang](https://golang.org/doc/install)
 
 
-# Build
+# Building
+
+### Download source code
 
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
 cd mixin-python
 python3 -m pip install -r requirements-dev.txt 
+```
+
+### Update mixin-python source code
+
+```bash
+git pull
+git submodule update --init --recursive
 ```
 
 Linux
@@ -48,13 +57,6 @@ macOS X
 
 ```
 ./build-mac.sh
-```
-
-# Update mixin-python after clone
-
-```bash
-git pull
-git submodule update --init --recursive
 ```
 
 # Installation
