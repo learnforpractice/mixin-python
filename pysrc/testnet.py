@@ -1,8 +1,10 @@
 import os
 import json
 import time
+import asyncio
 import shutil
 import tempfile
+import requests
 import shlex, subprocess
 
 from .mixin_api import MixinApi
@@ -87,6 +89,12 @@ class MixinTestnet(object):
             os.mkdir('testnet')
         for i in range(self.node_count):
             port = 7001+i
+            temp_dir = os.path.join('testnet', f'config-{port}')
+            self.config_dirs.append(temp_dir)
+            if os.path.exists(temp_dir):
+                continue
+            os.mkdir(temp_dir)
+
             config = '''
 [node]
 signer-key = "%s"
@@ -97,11 +105,6 @@ ring-cache-size = 4096
 ring-final-size = 16384
 [network]
 listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], port)
-
-            temp_dir = os.path.join('testnet', f'config-{port}')
-            os.mkdir(temp_dir)
-
-            self.config_dirs.append(temp_dir)
 
             config_file = os.path.join(temp_dir, 'config.toml')
             with open(config_file, 'w') as f:
@@ -135,6 +138,18 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
             log = open(f'{config_dir}/log.txt', 'a')
             p = subprocess.Popen(args, stdout=log, stderr=log)
             self.nodes.append(p)
+
+        time.sleep(1.5)
+        while True:
+            try:
+                data = {'method': 'getinfo', 'params': []}
+                headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+                r = requests.post('http://127.0.0.1:8007', json=data, headers=headers)
+                r = r.json()
+                break
+            except Exception as e:
+                print(e)
+                time.sleep(0.5)
 
     def start(self):
         if os.path.exists('testnet/testnet.json'):
@@ -199,3 +214,4 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
 
     def __del__(self):
         self.stop()
+
