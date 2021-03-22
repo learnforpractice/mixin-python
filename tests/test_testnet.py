@@ -125,13 +125,13 @@ class TestMixinApi(object):
         address = self.testnet.node_addresses[0]['signer']
         params = {
             "seed": '', #account['spend_key'],
-            "key": json.dumps([address['view_key'] + address['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
+            "keys": [address['view_key'] + address['spend_key']],
+            "raw": trx,
+            "input_index": 0
         }
-        r = self.api.sign_transaction(params)
+        r = self.api.sign_transaction(trx, [address])
         # logger.info(r)
-        r = await self.api.send_transaction(r['raw'])
+        r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
         deposit_hash = r['hash']
 
@@ -171,17 +171,17 @@ class TestMixinApi(object):
         # logger.info(trx)
         params = {
             "seed": '', #account['spend_key'],
-            "key": json.dumps([account['view_key'] + account['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
+            "keys": [account['view_key'] + account['spend_key']],
+            "raw": trx,
+            "input_index": 0
         }
         r = await self.api.get_info()
 
         for i in range(10):
             try:
-                r = self.api.sign_transaction(params)
+                r = self.api.sign_transaction(trx, [account], 0)
                 # logger.info(r)
-                transfer_ret = await self.api.send_transaction(r['raw'])
+                transfer_ret = await self.api.send_raw_transaction(r['raw'])
                 break
             except Exception as e:
                 logger.info(e)
@@ -225,17 +225,17 @@ class TestMixinApi(object):
 
         params = {
             "seed": '', #account['spend_key'],
-            "key": json.dumps([account['view_key'] + account['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
+            "keys": [account['view_key'] + account['spend_key']],
+            "raw": trx,
+            "input_index": 0
         }
 
         await asyncio.sleep(2.0)
         for i in range(10):
             try:
-                r = self.api.sign_transaction(params)
+                r = self.api.sign_transaction(trx, [account], 0)
                 # logger.info(r)
-                transfer_ret = await self.api.send_transaction(r['raw'])
+                transfer_ret = await self.api.send_raw_transaction(r['raw'])
                 break
             except Exception as e:
                 logger.info(e)

@@ -18,6 +18,9 @@ from . import _mixin
 
 logger = log.get_logger(__name__)
 
+ETH_CHAIN_ID = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+EOS_CHAIN_ID = '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
+
 class MixinApi(object):
 
     def __init__(self, url):
@@ -166,7 +169,7 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
-    def sign_transaction(self, params):
+    def sign_transaction(self, trx, accounts, input_index=0, seed=''):
         '''
         type signerInput struct {
             Inputs []struct {
@@ -197,19 +200,44 @@ class MixinApi(object):
         {
             "raw":
             "seed":
-            "key":
+            "keys"
         }
         '''
+
+        keys = []
+        for a in accounts:
+            keys.append(a['view_key'] + a['spend_key'])
+
+        params = {
+            "seed": seed,
+            "keys": keys,
+            "raw": trx,
+            "input_index": input_index
+        }
+
         params["node"] = self.node_url
-        if isinstance(params, dict):
-            params = json.dumps(params)
+        params = json.dumps(params)
+
         ret = _mixin.sign_transaction(params)
         ret = json.loads(ret)
         if 'error' in ret:
             raise Exception(ret['error'])
         ret = ret['data']
-        ret['signature'] = json.loads(ret['signature'])
+        ret['signatures'] = json.loads(ret['signatures'])
         return ret
+
+    async def send_raw_transaction(self, raw):
+        data = {'method': 'sendrawtransaction', 'params': [raw]}
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = await self.client.post(self.node_url, json=data, headers=headers)
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
+        return r['data']
+
+    async def send_transaction(self, trx, accounts, input_index=0, seed=''):
+        r = self.sign_transaction(trx, accounts, input_index, seed)
+        return await self.send_raw_transaction(r['raw'])
 
     async def get_info(self):
         data = {'method': 'getinfo', 'params': []}
@@ -283,15 +311,6 @@ class MixinApi(object):
             raise Exception(r['error'])
         return r['data']
 
-    async def send_transaction(self, raw):
-        data = {'method': 'sendrawtransaction', 'params': [raw]}
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = await self.client.post(self.node_url, json=data, headers=headers)
-        r = r.json()
-        if 'error' in r:
-            raise Exception(r['error'])
-        return r['data']
-
     async def get_transaction(self, trx_hash):
         data = {'method': 'gettransaction', 'params': [trx_hash]}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -345,15 +364,38 @@ class MixinApi(object):
     def batch_verify(self, msg, keys, sigs):
         return _mixin.batch_verify(msg, keys, sigs)
 
-    def get_asset_id(self, asset):
+    def get_asset_id(self, chain_id, asset_key):
+        '''
+        Example:
+        api = MixinApi('http://mixin-node0.exinpool.com:8239')
+        chain_id = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+        asset_key = '0xa974c709cfb4566686553a20790685a47aceaa33'
+        ret = api.get_asset_id(chain_id, asset_key)
+        '''
+        asset = {
+            'chain_id': chain_id,
+            'asset_key': asset_key
+        }
         asset = json.dumps(asset)
+        print(asset)
         ret = _mixin.get_asset_id(asset)
         ret = json.loads(ret)
         if 'error' in ret:
             raise Exception(ret['error'])
         return ret['data']
 
-    def get_fee_asset_id(self, asset):
+    def get_eth_asset_id(self, contract_address):
+        return self.get_asset_id(ETH_CHAIN_ID, contract_address)
+
+    def get_eos_asset_id(self, contract, symbol):
+        asset_key = f'{contract}:{symbol}'
+        return self.get_asset_id(EOS_CHAIN_ID, asset_key)
+
+    def get_fee_asset_id(self, chain_id, asset_key):
+        asset = {
+            'chain_id': chain_id,
+            'asset_key': asset_key
+        }
         asset = json.dumps(asset)
         ret = _mixin.get_fee_asset_id(asset)
         ret = json.loads(ret)
@@ -364,10 +406,10 @@ class MixinApi(object):
     def new_ghost_keys(self, seed, accounts, outputs):
         if isinstance(seed, bytes):
             seed = seed.hex()
-        assert len(seed) == 64, 'bad seed length'
+        # assert len(seed) == 64, 'bad seed length'
         accounts = json.dumps(accounts)
         ret = _mixin.new_ghost_keys(seed, accounts, outputs)
         ret = json.loads(ret)
         if 'error' in ret:
             raise Exception(ret['error'])
-        return ret['data']
+        return json.loads(ret['data'])

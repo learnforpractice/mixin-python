@@ -137,273 +137,11 @@ class TestMixinApi(object):
         r = self.api.decode_transaction(r)
         logger.info(r)
 
-    def test_sign_transaction(self):
-        account = {
-            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
-            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
-            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
-        }
-
-# {'address': 'XINJAJUFCWSQJa3tMNte3biMwXPEs4ptbVvBho17R48zUYXyDgn4eLgc58P2fdhQ6CnYzpGtNtjDb7XaNmx6JJrsawUq1VjC',
-#  'view_key': '7f6209043a7238eaba761e8c0aa354c7dff5cd166d4fb6ede229d484a2c6e40a',
-#  'spend_key': '1decce01df980cf27bcedbfed2c7bb8a4a99ed73e63502640718f7ce93192202'}
-
-        # type signerInput struct {
-        # 	Inputs []struct {
-        # 		Hash    crypto.Hash `json:"hash"`
-        # 		Index   int         `json:"index"`
-        # 		Deposit *struct {
-        # 			Chain           crypto.Hash    `json:"chain"`
-        # 			AssetKey        string         `json:"asset"`
-        # 			TransactionHash string         `json:"transaction"`
-        # 			OutputIndex     uint64         `json:"index"`
-        # 			Amount          common.Integer `json:"amount"`
-        # 		} `json:"deposit,omitempty"`
-        # 		Keys []crypto.Key `json:"keys"`
-        # 		Mask crypto.Key   `json:"mask"`
-        # 	} `json:"inputs"`
-        # 	Outputs []struct {
-        # 		Type     uint8             `json:"type"`
-        # 		Mask     crypto.Key        `json:"mask"`
-        # 		Keys     []crypto.Key      `json:"keys"`
-        # 		Amount   common.Integer    `json:"amount"`
-        # 		Script   common.Script     `json:"script"`
-        # 		Accounts []*common.Address `json:"accounts"`
-        # 	}
-        # 	Asset crypto.Hash `json:"asset"`
-        # 	Extra string      `json:"extra"`
-        # 	Node  string      `json:"-"`
-        # }
-        trx = {
-            "inputs": [
-                {
-                    "hash": 'e26f9dd1afc7dd5a216019f27f369a7123ade2c20b7ea07602b218e281ba93e4',
-                    "index": 0,
-                    # "keys": [],
-                    # "mask": '0'*64
-                }
-            ],
-            "Outputs":[
-                {
-                    "type": 0,
-                    # "mask" :"b3f9f76c5be32ba2c90de2a6442cb3b0356d79c2241ddc87109822e9ea31ae49",
-                    # "keys": ["0da9d5806be84cedf0f029ce9cb9b5dc4d23dc019f802d9e5b0d6377c3bfb3e9"],
-                    "amount": "0.1",
-                    "script": 'fffe01',
-                    "accounts": [
-                        'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm']
-                },
-                {
-                    "type": 0,
-                    # "mask" :"b3f9f76c5be32ba2c90de2a6442cb3b0356d79c2241ddc87109822e9ea31ae49",
-                    # "keys": ["0da9d5806be84cedf0f029ce9cb9b5dc4d23dc019f802d9e5b0d6377c3bfb3e9"],
-                    "amount": "0.9",
-                    "script": 'fffe01',
-                    "accounts": [
-                        'XINJAJUFCWSQJa3tMNte3biMwXPEs4ptbVvBho17R48zUYXyDgn4eLgc58P2fdhQ6CnYzpGtNtjDb7XaNmx6JJrsawUq1VjC']
-                },
-            ],
-            "asset": "b9f49cf777dc4d03bc54cd1367eebca319f8603ea1ce18910d09e2c540c630d8",
-            "extra": b"helloworld".hex(),
-            # "-": ""
-#            "Node":
-        }
-        params = {
-            "seed": '', #account['spend_key'],
-            "key": json.dumps([account['view_key'] + account['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
-        }
-        r = self.api.sign_transaction(params)
+    def test_new_ghost_keys(self):
+        seed = 'a'*64
+        addr =self.api.create_address()
+        r = self.api.new_ghost_keys(seed, [addr['address'],], 1)
         logger.info(r)
-
-    def test_sign_transaction2(self):
-        account = {
-            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
-            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
-            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
-        }
-
-# {'address': 'XINJAJUFCWSQJa3tMNte3biMwXPEs4ptbVvBho17R48zUYXyDgn4eLgc58P2fdhQ6CnYzpGtNtjDb7XaNmx6JJrsawUq1VjC',
-#  'view_key': '7f6209043a7238eaba761e8c0aa354c7dff5cd166d4fb6ede229d484a2c6e40a',
-#  'spend_key': '1decce01df980cf27bcedbfed2c7bb8a4a99ed73e63502640718f7ce93192202'}
-
-        # type signerInput struct {
-        # 	Inputs []struct {
-        # 		Hash    crypto.Hash `json:"hash"`
-        # 		Index   int         `json:"index"`
-        # 		Deposit *struct {
-        # 			Chain           crypto.Hash    `json:"chain"`
-        # 			AssetKey        string         `json:"asset"`
-        # 			TransactionHash string         `json:"transaction"`
-        # 			OutputIndex     uint64         `json:"index"`
-        # 			Amount          common.Integer `json:"amount"`
-        # 		} `json:"deposit,omitempty"`
-        # 		Keys []crypto.Key `json:"keys"`
-        # 		Mask crypto.Key   `json:"mask"`
-        # 	} `json:"inputs"`
-        # 	Outputs []struct {
-        # 		Type     uint8             `json:"type"`
-        # 		Mask     crypto.Key        `json:"mask"`
-        # 		Keys     []crypto.Key      `json:"keys"`
-        # 		Amount   common.Integer    `json:"amount"`
-        # 		Script   common.Script     `json:"script"`
-        # 		Accounts []*common.Address `json:"accounts"`
-        # 	}
-        # 	Asset crypto.Hash `json:"asset"`
-        # 	Extra string      `json:"extra"`
-        # 	Node  string      `json:"-"`
-        # }
-        trx = {
-            "inputs": [
-                {
-                    "hash": '0a121a7d64e2d01c6efb4cf23734655b2cb1cf65b54eaa330ad6da643875e938',
-                    "index": 0,
-                    # "keys": [],
-                    # "mask": '0'*64
-                }
-            ],
-            "Outputs":[
-                {
-                    "type": 0,
-                    # "mask" :"b3f9f76c5be32ba2c90de2a6442cb3b0356d79c2241ddc87109822e9ea31ae49",
-                    # "keys": ["0da9d5806be84cedf0f029ce9cb9b5dc4d23dc019f802d9e5b0d6377c3bfb3e9"],
-                    "amount": "0.1",
-                    "script": 'fffe02',
-                    "accounts": [
-                        'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
-                        'XINJAJUFCWSQJa3tMNte3biMwXPEs4ptbVvBho17R48zUYXyDgn4eLgc58P2fdhQ6CnYzpGtNtjDb7XaNmx6JJrsawUq1VjC'
-                        ]
-                },
-            ],
-            "asset": "b9f49cf777dc4d03bc54cd1367eebca319f8603ea1ce18910d09e2c540c630d8",
-            "extra": b"helloworld".hex(),
-            # "-": ""
-#            "Node":
-        }
-        params = {
-            "seed": '', #account['spend_key'],
-            "key": json.dumps([account['view_key'] + account['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
-        }
-        r = self.api.sign_transaction(params)
-        logger.info(r)
-
-    def test_multi_sign_transaction(self):
-        account = {
-            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
-            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
-            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
-        }
-
-        account2 = {
-            'address': 'XINJAJUFCWSQJa3tMNte3biMwXPEs4ptbVvBho17R48zUYXyDgn4eLgc58P2fdhQ6CnYzpGtNtjDb7XaNmx6JJrsawUq1VjC',
-            'view_key': '7f6209043a7238eaba761e8c0aa354c7dff5cd166d4fb6ede229d484a2c6e40a',
-            'spend_key': '1decce01df980cf27bcedbfed2c7bb8a4a99ed73e63502640718f7ce93192202'
-        }
-
-        # type signerInput struct {
-        # 	Inputs []struct {
-        # 		Hash    crypto.Hash `json:"hash"`
-        # 		Index   int         `json:"index"`
-        # 		Deposit *struct {
-        # 			Chain           crypto.Hash    `json:"chain"`
-        # 			AssetKey        string         `json:"asset"`
-        # 			TransactionHash string         `json:"transaction"`
-        # 			OutputIndex     uint64         `json:"index"`
-        # 			Amount          common.Integer `json:"amount"`
-        # 		} `json:"deposit,omitempty"`
-        # 		Keys []crypto.Key `json:"keys"`
-        # 		Mask crypto.Key   `json:"mask"`
-        # 	} `json:"inputs"`
-        # 	Outputs []struct {
-        # 		Type     uint8             `json:"type"`
-        # 		Mask     crypto.Key        `json:"mask"`
-        # 		Keys     []crypto.Key      `json:"keys"`
-        # 		Amount   common.Integer    `json:"amount"`
-        # 		Script   common.Script     `json:"script"`
-        # 		Accounts []*common.Address `json:"accounts"`
-        # 	}
-        # 	Asset crypto.Hash `json:"asset"`
-        # 	Extra string      `json:"extra"`
-        # 	Node  string      `json:"-"`
-        # }
-        trx = {
-            "inputs": [
-                {
-                    "hash": '28416305558388eed2cc12d0a6fe32201371f631d86751736f591120d3d2b07e',
-                    "index": 0,
-                    # "keys": [],
-                    # "mask": '0'*64
-                }
-            ],
-            "Outputs":[
-                {
-                    "type": 0,
-                    # "mask" :"b3f9f76c5be32ba2c90de2a6442cb3b0356d79c2241ddc87109822e9ea31ae49",
-                    # "keys": ["0da9d5806be84cedf0f029ce9cb9b5dc4d23dc019f802d9e5b0d6377c3bfb3e9"],
-                    "amount": "0.1",
-                    "script": 'fffe01',
-                    "accounts": [
-                        'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm'                    ]
-                }
-            ],
-            "asset": "b9f49cf777dc4d03bc54cd1367eebca319f8603ea1ce18910d09e2c540c630d8",
-            "extra": b"helloworld".hex(),
-            # "-": ""
-#            "Node":
-        }
-        params = {
-            "seed": '', #account['spend_key'],
-            "key": json.dumps([account['view_key'] + account['spend_key']]),
-            "raw": json.dumps(trx),
-            "inputIndex": "0"
-        }
-        r = self.api.sign_transaction(params)
-        logger.info(r)
-        signatures = {}
- 
-        # r = self.api.decode_transaction(r['raw'])
-        # logger.info(r)
- 
-        params = {
-            "input_index": "0",
-            "raw": r['raw'],
-            "trx": json.dumps(trx),
-            "keys": json.dumps([account['view_key'] + account['spend_key']]),
-        }
-        signature = self.api.sign_raw_transaction(params)
-        logger.info(signature)
-        signatures = signature
-
-        params = {
-            "input_index": "0",
-            "raw": r['raw'],
-            "trx": json.dumps(trx),
-            "keys": json.dumps([account2['view_key'] + account2['spend_key']]),
-        }
-        signature = self.api.sign_raw_transaction(params)
-        logger.info(signature)
-        signatures[0].update(signature[0])
-
-        r = self.api.add_signatures_to_raw_transaction(r['raw'], signatures)
-        logger.info(r)
-
-        r = self.api.decode_transaction(r)
-        logger.info(r)
-
-    def test_add_signatures_to_raw_transaction(self):
-
-        self.api.add_signatures_to_raw_transaction()
-
-# seed, err := hex.DecodeString(c.String("seed"))
-# viewKey, err := crypto.KeyFromString(c.String("view"))
-# spendKey, err := crypto.KeyFromString(c.String("spend"))
-# asset, err := crypto.HashFromString(c.String("asset"))
-# extra, err := hex.DecodeString(c.String("extra"))
-# for _, in := range strings.Split(c.String("inputs"), ",") {
-# for _, out := range strings.Split(c.String("outputs"), ",") {
 
     def test_build_raw_transaction(self):
         account = {
@@ -485,42 +223,37 @@ class TestMixinApi(object):
 
     def test_asset_id(self):
         #XIN asset id
-        asset = {
-            'chain_id':'8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27',
-            'asset_key':'0xa974c709cfb4566686553a20790685a47aceaa33'
-        }
-        ret = self.api.get_asset_id(asset)
+        chain_id = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+        asset_key = '0xa974c709cfb4566686553a20790685a47aceaa33'
+        ret = self.api.get_asset_id(chain_id, asset_key)
         logger.info(ret)
         assert ret == 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc'
+        # assert self.api.get_eth_asset_id(asset_key) == 'a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc'
 
         #ETH asset id
-        asset = {
-            'chain_id':'8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27',
-            'asset_key':'0x0000000000000000000000000000000000000000'
-        }
-        ret = self.api.get_asset_id(asset)
+        chain_id = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+        asset_key = '0x0000000000000000000000000000000000000000'
+        ret = self.api.get_asset_id(chain_id, asset_key)
         logger.info(ret)
         assert ret == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
+        assert self.api.get_eth_asset_id(asset_key) == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
 
-        ret = self.api.get_fee_asset_id(asset)
+        ret = self.api.get_fee_asset_id(chain_id, asset_key)
         logger.info(ret)
         assert ret == '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
 
         # EOS asset id
-        asset = {
-            'chain_id':'6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d',
-            'asset_key':"eosio.token:EOS"
-        }
-        ret = self.api.get_asset_id(asset)
+        chain_id = '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
+        asset_key = "eosio.token:EOS"
+        ret = self.api.get_asset_id(chain_id, asset_key)
         logger.info('EOS asset id: %s', ret)
         assert ret == '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
+        assert self.api.get_eos_asset_id('eosio.token', 'EOS') == '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
 
         #EOS USDT asset id
-        asset = {
-            'chain_id':'6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d',
-            'asset_key':"tethertether:USDT"
-        }
-        ret = self.api.get_asset_id(asset)
+        chain_id = '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
+        asset_key = "tethertether:USDT"
+        ret = self.api.get_asset_id(chain_id, asset_key)
         logger.info('USDT asset id:%s', ret)
 
     def test_decode_host_key(self):
