@@ -1,37 +1,126 @@
-## Welcome to GitHub Pages
+# Python Bindings for [ Mixin](https://github.com/mixinNetwork/mixin)
 
-You can use the [editor on GitHub](https://github.com/learnforpractice/mixin-python/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+<h3>
+  <a
+    target="_blank"
+    href="https://mybinder.org/v2/gh/learnforpractice/mixin-python/HEAD?filepath=notebook%2Fhelloworld.ipynb"
+  >
+    Quick Start
+    <img alt="Binder" valign="bottom" height="25px"
+    src="https://mybinder.org/badge_logo.svg"
+    />
+  </a>
+</h3>
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
+# Install Build Dependencies
 
-- Bulleted
-- List
+clang & go 1.16 & cmake
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+## Ubuntu
+```
+sudo apt install python3-dev
+sudo apt install python3-pip
+sudo apt install clang
+sudo apt install cmake
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+[Intall golang](https://golang.org/doc/install)
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/learnforpractice/mixin-python/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+# Building
 
-### Support or Contact
+```
+git clone https://github.com/learnforpractice/mixin-python --recursive
+cd mixin-python
+python3 -m pip install -r requirements-dev.txt 
+```
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Linux
+
+```
+./build-linux.sh
+```
+
+macOS X
+
+```
+./build-mac.sh
+```
+
+# Installation
+
+```bash
+python3 -m pip install dist/mixin-0.1.0-*
+```
+
+### Install from prebuild package
+
+Ubuntu python3.7
+```bash
+python3.7 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp37-cp37m-linux_x86_64.whl
+```
+
+Ubuntu python3.8
+```bash
+python3.8 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp38-cp38-linux_x86_64.whl
+```
+
+macOS X
+```bash
+python3.7 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp37-cp37m-macosx_10_9_x86_64.whl
+```
+
+# Quick Start
+
+```python
+from mixin.mixin_api import MixinApi
+api = MixinApi('http://mixin-node0.exinpool.com:8239')
+api.create_address()
+```
+
+```
+    {'address': 'XIN9M9T32UhraHpJ9Do4s7FVFeTpery49JB1u6bAcgLe2wY4As918roNTVmbh3GXuuoRLx5FyeuhvUQUmvtWtUthGdgBCdMG',
+     'view_key': '6396fd4201bbec6f495ded697428003dfd227578174f97e034c94e1abb420d0f',
+     'spend_key': '02f0ea8504740a1c2916e1b9965c23c242aeeb02d093f3f1ed0e5e0d494bc603'}
+```
+
+```
+api.get_info()
+```
+
+# Run mixin from Python
+
+```bash
+python3 -m mixin.main kernel --dir config --port 9000
+```
+
+# Run a Local Mixin Testnet
+
+```bash
+python3 tests/start_testnet.py
+```
+
+# Run tests in jupyter notebook
+```bash
+python3 -m pip install notebook
+cd notebook
+python3 -m notebook
+```
+Open helloworld.ipynb, hit Ctrl+Enter to run the test code in cell
+
+Do not forget to run testnet.stop() to stop the testnet, otherwise the testnet processes will still running in the backgroud.
+
+# [Mixin API document](mixin_api.md)
+
+
+# Reference
+
+https://github.com/wenewzhang/mixin-python3-sdk
+
+# License
+
+[GPL3.0](./LICENSE)
