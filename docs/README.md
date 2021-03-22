@@ -1,4 +1,6 @@
-# Python Bindings for [Mixin](https://github.com/mixinNetwork/mixin)
+# Python Bindings for [ Mixin](https://github.com/mixinNetwork/mixin)
+
+
 <h3>
   <a
     target="_blank"
@@ -10,6 +12,9 @@
     />
   </a>
 </h3>
+
+
+
 
 # Install Build Dependencies
 
@@ -26,7 +31,7 @@ sudo apt install cmake
 [Intall golang](https://golang.org/doc/install)
 
 
-# Build
+# Building
 
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
@@ -52,7 +57,7 @@ macOS X
 python3 -m pip install dist/mixin-0.1.0-*
 ```
 
-## Install from prebuild package
+### Install from prebuild package
 
 Ubuntu python3.7
 ```bash
@@ -109,6 +114,9 @@ Open helloworld.ipynb, hit Ctrl+Enter to run the test code in cell
 
 Do not forget to run testnet.stop() to stop the testnet, otherwise the testnet processes will still running in the backgroud.
 
+# [Mixin API document](mixin_api.md)
+
+
 # Reference
 
 https://github.com/wenewzhang/mixin-python3-sdk
@@ -116,4 +124,3 @@ https://github.com/wenewzhang/mixin-python3-sdk
 # License
 
 [GPL3.0](./LICENSE)
-
