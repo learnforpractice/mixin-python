@@ -11,6 +11,10 @@
   </a>
 </h3>
 
+# [Releases](https://github.com/learnforpractice/mixin-python/releases/tag/v0.1)
+
+# [Docs](https://learnforpractice.github.io/mixin-python/)
+
 # Install Build Dependencies
 
 clang & go 1.16 & cmake
