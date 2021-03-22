@@ -5,7 +5,7 @@ import json
 import mixin_config
 from mixin_bot_api import MixinBotApi
 
-mixin_bot = MixinBotApi(mixin_config)
+mixin_bot = MixinBotApi(mixin_config.config)
 
 
 # 启动 Flask

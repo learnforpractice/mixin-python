@@ -21,7 +21,7 @@ logger = log.get_logger(__name__)
 class MIXIN_WS_API:
 
     def __init__(self, on_message):
-        self.mixin_bot = MixinBotApi(mixin_config)
+        self.mixin_bot = MixinBotApi(mixin_config.config)
         self.ws = None
         self.on_message = on_message
 

@@ -25,18 +25,17 @@ import json
 from urllib.parse import urlencode
 
 import httpx
-from . import mixin_config
 
 class MixinBotApi:
     def __init__(self, mixin_config):
 
         # robot's config
-        self.client_id = mixin_config.client_id
-        self.client_secret = mixin_config.client_secret
-        self.pay_session_id = mixin_config.pay_session_id
-        self.pay_pin = mixin_config.pay_pin
-        self.pin_token = mixin_config.pin_token
-        self.private_key = mixin_config.private_key
+        self.client_id = mixin_config['client_id']
+        self.client_secret = mixin_config['client_secret']
+        self.pay_session_id = mixin_config['session_id']
+        self.pay_pin = mixin_config['pin']
+        self.pin_token = mixin_config['pin_token']
+        self.private_key = mixin_config['private_key']
 
         self.client = httpx.AsyncClient()
 
@@ -49,32 +48,30 @@ class MixinBotApi:
     BASE METHON
     """
 
-    def generateSig(self, method, uri, body):
+    def generate_sig(self, method, uri, body):
         hashresult = hashlib.sha256((method + uri+body).encode('utf-8')).hexdigest()
         return hashresult
 
-    def genGETPOSTSig(self, methodstring, uristring, bodystring):
-        jwtSig = self.generateSig(methodstring, uristring, bodystring)
-
+    def gen_get_post_sig(self, methodstring, uristring, bodystring):
+        jwtSig = self.generate_sig(methodstring, uristring, bodystring)
         return jwtSig
 
-
-    def genGETSig(self, uristring, bodystring):
-        return self.genGETPOSTSig("GET", uristring, bodystring)
+    def gen_get_sig(self, uristring, bodystring):
+        return self.gen_get_post_sig("GET", uristring, bodystring)
 
     def genPOSTSig(self, uristring, bodystring):
-        return self.genGETPOSTSig("POST", uristring, bodystring)
+        return self.gen_get_post_sig("POST", uristring, bodystring)
 
-    def genGETJwtToken(self, uristring, bodystring, jti):
-        jwtSig = self.genGETSig(uristring, bodystring)
+    def gen_get_jwt_token(self, uristring, bodystring, jti):
+        jwtSig = self.gen_get_sig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
         encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
 
         return encoded
 
-    def genGETListenSignedToken(self, uristring, bodystring, jti):
-        jwtSig = self.genGETSig(uristring, bodystring)
+    def gen_get_listen_signed_token(self, uristring, bodystring, jti):
+        jwtSig = self.gen_get_sig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
         encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
@@ -84,14 +81,14 @@ class MixinBotApi:
         return signature
 
 
-    def genPOSTJwtToken(self, uristring, bodystring, jti):
+    def gen_post_jwt_token(self, uristring, bodystring, jti):
         jwtSig = self.genPOSTSig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
         encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
         return encoded
 
-    def genEncrypedPin(self, iterString = None):
+    def gen_encryped_pin(self, iterString = None):
         if self.keyForAES == "":
             privKeyObj = RSA.importKey(self.private_key)
 
@@ -126,21 +123,16 @@ class MixinBotApi:
 
         return encrypted_pin
 
-    """
-    COMMON METHON
-    """
-
-    """
-    generate API url
-    """
     def __genUrl(self, path):
+        """
+        generate API url
+        """
         return self.api_base_url + path
 
-    """
-    generate GET http request
-    """
     async def __genGetRequest(self, path, auth_token=""):
-
+        """
+        generate GET http request
+        """
         url = self.__genUrl(path)
 
         if auth_token == "":
@@ -152,11 +144,10 @@ class MixinBotApi:
         # print(result_obj)
         return result_obj['data']
 
-    """
-    generate POST http request
-    """
     async def __genPostRequest(self, path, body, auth_token=""):
-
+        """
+        generate POST http request
+        """
         # generate url
         url = self.__genUrl(path)
 
@@ -172,11 +163,10 @@ class MixinBotApi:
         # print(result_obj)
         return result_obj
 
-    """
-    generate Mixin Network GET http request
-    """
     async def __genNetworkGetRequest(self, path, body=None, auth_token=""):
-
+        """
+        generate Mixin Network GET http request
+        """
         url = self.__genUrl(path)
 
         if body is not None:
@@ -185,26 +175,24 @@ class MixinBotApi:
             body = ""
 
         if auth_token == "":
-            token = self.genGETJwtToken(path, body, str(uuid.uuid4()))
+            token = self.gen_get_jwt_token(path, body, str(uuid.uuid4()))
             auth_token = token.decode('utf8')
 
         r = await self.client.get(url, headers={"Authorization": "Bearer " + auth_token})
         result_obj = r.json()
         return result_obj
 
-
-    """
-    generate Mixin Network POST http request
-    """
     # TODO: request
     async def __genNetworkPostRequest(self, path, body, auth_token=""):
-
+        """
+        generate Mixin Network POST http request
+        """
         # transfer obj => json string
         body_in_json = json.dumps(body)
 
         # generate robot's auth token
         if auth_token == "":
-            token = self.genPOSTJwtToken(path, body_in_json, str(uuid.uuid4()))
+            token = self.gen_post_jwt_token(path, body_in_json, str(uuid.uuid4()))
             auth_token = token.decode('utf8')
         headers = {
             'Content-Type'  : 'application/json',
@@ -230,35 +218,33 @@ class MixinBotApi:
     """
 
 
-    """
-    Read user's all assets.
-    """
-    async def getMyAssets(self, auth_token=""):
+    async def get_my_assets(self, auth_token=""):
+        """
+        Read user's all assets.
+        """
         return await self.__genGetRequest('/assets', auth_token)
 
-    async def postRequest(self, path, body):
+    async def post_request(self, path, body):
         return await self.__genNetworkPostRequest(path, body)
 
-    async def getGhostKeys(self, user_id):
+    async def get_ghost_keys(self, user_id):
         body = {"index":0, "receivers":[user_id]}
-        return await self.postRequest('/outputs', body)
+        return await self.post_request('/outputs', body)
 
-    async def getMultisigns(self):
-#        return self.__genGetRequest('/multisigs?limit=500', auth_token)
+    async def get_multi_signs(self):
         return await self.__genNetworkGetRequest('/multisigs?limit=500')
-#    __genNetworkGetRequest
 
-    """
-    Read self profile.
-    """
-    async def getMyProfile(self, auth_token):
+    async def get_my_profile(self, auth_token):
+        """
+        Read self profile.
+        """
         return await self.__genGetRequest('/me', auth_token)
 
-    """
-    ?
-    Update my preferences.
-    """
-    async def updateMyPerference(self,receive_message_source="EVERYBODY",accept_conversation_source="EVERYBODY"):
+    async def update_my_perference(self,receive_message_source="EVERYBODY",accept_conversation_source="EVERYBODY"):
+        """
+        ?
+        Update my preferences.
+        """
 
         body = {
             "receive_message_source": receive_message_source,
@@ -267,13 +253,11 @@ class MixinBotApi:
 
         return await self.__genPostRequest('/me/preferences', body)
 
-
-    """
-    ?
-    Update my profile.
-    """
-    async def updateMyProfile(self, full_name, auth_token, avatar_base64=""):
-
+    async def update_my_profile(self, full_name, auth_token, avatar_base64=""):
+        """
+        ?
+        Update my profile.
+        """
         body = {
             "full_name": full_name,
             "avatar_base64": avatar_base64
@@ -281,41 +265,40 @@ class MixinBotApi:
 
         return await self.__genPostRequest('/me', body, auth_token)
 
-    """
-    Get users information by IDs.
-    """
-    async def getUsersInfo(self, user_ids, auth_token):
+    async def get_users_info(self, user_ids, auth_token):
+        """
+        Get users information by IDs.
+        """
         return await self.__genPostRequest('/users/fetch', user_ids, auth_token)
 
-    """
-    Get user's information by ID.
-    """
-    async def getUserInfo(self, user_id, auth_token):
+    async def get_user_info(self, user_id, auth_token):
+        """
+        Get user's information by ID.
+        """
         return await self.__genGetRequest('/users/' + user_id, auth_token)
 
-    """
-    Search user by Mixin ID or Phone Number.
-    """
-    async def SearchUser(self, q, auth_token=""):
+    async def search_user(self, q, auth_token=""):
+        """
+        Search user by Mixin ID or Phone Number.
+        """
         return await self.__genGetRequest('/search/' + q, auth_token)
 
-    """
-    Rotate user’s code_id.
-    """
-    async def rotateUserQR(self, auth_token):
+    async def rotate_user_qr(self, auth_token):
+        """
+        Rotate user’s code_id.
+        """
         return await self.__genGetRequest('/me/code', auth_token)
 
-    """
-    Get my friends.
-    """
-    async def getMyFriends(self, auth_token):
+    async def get_my_friends(self, auth_token):
+        """
+        Get my friends.
+        """
         return await self.__genGetRequest('/friends', auth_token)
 
-    """
-    Create a GROUP or CONTACT conversation.
-    """
-    async def createConv(self, category, conversation_id, participants, action, role, user_id, auth_token):
-
+    async def create_conv(self, category, conversation_id, participants, action, role, user_id, auth_token):
+        """
+        Create a GROUP or CONTACT conversation.
+        """
         body = {
             "category": category,
             "conversation_id": conversation_id,
@@ -327,10 +310,10 @@ class MixinBotApi:
 
         return await self.__genPostRequest('/conversations', body, auth_token)
 
-    """
-    Read conversation by conversation_id.
-    """
-    async def getConv(self, conversation_id, auth_token):
+    async def get_conv(self, conversation_id, auth_token):
+        """
+        Read conversation by conversation_id.
+        """
         return await self.__genGetRequest('/conversations/' + conversation_id, auth_token)
 
 
@@ -341,15 +324,15 @@ class MixinBotApi:
     auth token need robot related param to generate.
     """
 
-    """
-    PIN is used to manage user’s addresses, assets and etc. There’s no default PIN for a Mixin Network user (except APP).
-    if auth_token is empty, it create robot' pin.
-    if auth_token is set, it create messenger user pin.
-    """
-    async def updatePin(self, new_pin, old_pin, auth_token=""):
+    async def update_pin(self, new_pin, old_pin, auth_token=""):
+        """
+        PIN is used to manage user’s addresses, assets and etc. There’s no default PIN for a Mixin Network user (except APP).
+        if auth_token is empty, it create robot' pin.
+        if auth_token is set, it create messenger user pin.
+        """
         old_inside_pay_pin = self.pay_pin
         self.pay_pin = new_pin
-        newEncrypedPin = self.genEncrypedPin()
+        newEncrypedPin = self.gen_encryped_pin()
         if old_pin == "":
             body = {
                 "old_pin": "",
@@ -358,7 +341,7 @@ class MixinBotApi:
         else:
 
             self.pay_pin = old_pin
-            oldEncryptedPin = self.genEncrypedPin()
+            oldEncryptedPin = self.gen_encryped_pin()
             body = {
                 "old_pin": oldEncryptedPin.decode(),
                 "pin": newEncrypedPin.decode()
@@ -366,32 +349,31 @@ class MixinBotApi:
         self.pay_pin = old_inside_pay_pin
         return await self.__genNetworkPostRequest('/pin/update', body, auth_token)
 
-    """
-    Verify PIN if is valid or not. For example, you can verify PIN before updating it.
-    if auth_token is empty, it verify robot' pin.
-    if auth_token is set, it verify messenger user pin.
-    """
-    async def verifyPin(self, auth_token=""):
-        enPin = self.genEncrypedPin()
+    async def verify_pin(self, auth_token=""):
+        """
+        Verify PIN if is valid or not. For example, you can verify PIN before updating it.
+        if auth_token is empty, it verify robot' pin.
+        if auth_token is set, it verify messenger user pin.
+        """
+        enPin = self.gen_encryped_pin()
         body = {
             "pin": enPin.decode()
         }
 
         return await self.__genNetworkPostRequest('/pin/verify', body, auth_token)
 
-    """
-    Grant an asset's deposit address, usually it is public_key, but account_name and account_tag is used for EOS.
-    """
     async def deposit(self, asset_id):
+        """
+        Grant an asset's deposit address, usually it is public_key, but account_name and account_tag is used for EOS.
+        """
         return await self.__genNetworkGetRequest(' /assets/' + asset_id)
 
-
-    """
-    withdrawals robot asset to address_id
-    Tips:Get assets out of Mixin Network, neet to create an address for withdrawal.
-    """
     async def withdrawals(self, address_id, amount, memo, trace_id=""):
-        encrypted_pin = self.genEncrypedPin()
+        """
+        withdrawals robot asset to address_id
+        Tips:Get assets out of Mixin Network, neet to create an address for withdrawal.
+        """
+        encrypted_pin = self.gen_encryped_pin()
 
         if trace_id == "":
             trace_id = str(uuid.uuid1())
@@ -407,15 +389,13 @@ class MixinBotApi:
 
         return await self.__genNetworkPostRequest('/withdrawals/', body)
 
-
-    """
-    Create an address for withdrawal, you can only withdraw through an existent address.
-    """
-    async def createAddress(self, asset_id, public_key = "", label = "", account_name = "", account_tag = ""):
-
+    async def create_address(self, asset_id, public_key = "", label = "", account_name = "", account_tag = ""):
+        """
+        Create an address for withdrawal, you can only withdraw through an existent address.
+        """
         body = {
             "asset_id": asset_id,
-            "pin": self.genEncrypedPin().decode(),
+            "pin": self.gen_encryped_pin().decode(),
             "public_key": public_key,
             "label": label,
             "account_name": account_name,
@@ -423,32 +403,28 @@ class MixinBotApi:
         }
         return await self.__genNetworkPostRequest('/addresses', body)
 
-
-    """
-    Delete an address by ID.
-    """
-    async def delAddress(self, address_id):
-
-        encrypted_pin = self.genEncrypedPin().decode()
+    async def del_address(self, address_id):
+        """
+        Delete an address by ID.
+        """
+        encrypted_pin = self.gen_encryped_pin().decode()
 
         body = {"pin": encrypted_pin}
 
         return await self.__genNetworkPostRequest('/addresses/' + address_id + '/delete', body)
 
-
-    """
-    Read an address by ID.
-    """
-    async def getAddress(self, address_id):
+    async def get_address(self, address_id):
+        """
+        Read an address by ID.
+        """
         return await self.__genNetworkGetRequest('/addresses/' + address_id)
 
-    """
-    Transfer of assets between Mixin Network users.
-    """
-    async def transferTo(self, to_user_id, to_asset_id, to_asset_amount, memo, trace_uuid=""):
-
+    async def transfer_to(self, to_user_id, to_asset_id, to_asset_amount, memo, trace_uuid=""):
+        """
+        Transfer of assets between Mixin Network users.
+        """
         # generate encrypted pin
-        encrypted_pin = self.genEncrypedPin()
+        encrypted_pin = self.gen_encryped_pin()
 
         body = {'asset_id': to_asset_id, 'counter_user_id': to_user_id, 'amount': str(to_asset_amount),
                 'pin': encrypted_pin.decode('utf8'), 'trace_id': trace_uuid, 'memo': memo}
@@ -457,17 +433,16 @@ class MixinBotApi:
 
         return await self.__genNetworkPostRequest('/transfers', body)
 
-    """
-    Read transfer by trace ID.
-    """
-    async def getTransfer(self, trace_id):
+    async def get_transfer(self, trace_id):
+        """
+        Read transfer by trace ID.
+        """
         return await self.__genNetworkGetRequest('/transfers/trace/' + trace_id)
 
-    """
-    Verify a transfer, payment status if it is 'paid' or 'pending'.
-    """
-    async def verifyPayment(self, asset_id, opponent_id, amount, trace_id):
-
+    async def verify_payment(self, asset_id, opponent_id, amount, trace_id):
+        """
+        Verify a transfer, payment status if it is 'paid' or 'pending'.
+        """
         body = {
             "asset_id": asset_id,
             "opponent_id": opponent_id,
@@ -477,17 +452,16 @@ class MixinBotApi:
 
         return await self.__genNetworkPostRequest('/payments', body)
 
-    """
-    Read asset by asset ID.
-    """
-    async def getAsset(self, asset_id):
+    async def get_asset(self, asset_id):
+        """
+        Read asset by asset ID.
+        """
         return await self.__genNetworkGetRequest('/assets/' + asset_id)
 
-    """
-    Read external transactions (pending deposits) by public_key and asset_id, use account_tag for EOS.
-    """
-    async def extTrans(self, asset_id, public_key, account_tag, account_name, limit, offset):
-
+    async def ext_trans(self, asset_id, public_key, account_tag, account_name, limit, offset):
+        """
+        Read external transactions (pending deposits) by public_key and asset_id, use account_tag for EOS.
+        """
         body = {
             "asset": asset_id,
             "public_key": public_key,
@@ -499,11 +473,10 @@ class MixinBotApi:
 
         return await self.__genNetworkGetRequest('/external/transactions', body)
 
-    """
-    Create a new Mixin Network user (like a normal Mixin Messenger user). You should keep PrivateKey which is used to sign an AuthenticationToken and encrypted PIN for the user.
-    """
-    async def createUser(self, session_secret, full_name):
-
+    async def create_user(self, session_secret, full_name):
+        """
+        Create a new Mixin Network user (like a normal Mixin Messenger user). You should keep PrivateKey which is used to sign an AuthenticationToken and encrypted PIN for the user.
+        """
         body = {
             "session_secret": session_secret,
             "full_name": full_name
@@ -518,16 +491,16 @@ class MixinBotApi:
     ===========
     """
 
-    """
-    Read top valuable assets of Mixin Network.
-    """
-    async def topAssets(self):
+    async def top_assets(self):
+        """
+        Read top valuable assets of Mixin Network.
+        """
         return await self.__genGetRequest('/network')
 
-    """
-    Read public snapshots of Mixin Network.
-    """
     async def snapshots(self, offset, asset_id, order='DESC',limit=100):
+        """
+        Read public snapshots of Mixin Network.
+        """
         # TODO: SET offset default(UTC TIME)
         body = {
             "limit":limit,
@@ -538,9 +511,8 @@ class MixinBotApi:
 
         return await self.__genGetRequest('/network/snapshots', body)
 
-
-    """
-    Read public snapshots of Mixin Network by ID.
-    """
     async def snapshot(self, snapshot_id):
+        """
+        Read public snapshots of Mixin Network by ID.
+        """
         return await self.__genGetRequest('/network/snapshots/' + snapshot_id)

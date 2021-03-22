@@ -2,14 +2,7 @@ import os
 import json
 import time
 import pytest
-import ctypes
-import logging
 import uuid
-import base64
-import gzip
-import random
-import threading
-from io import BytesIO
 import httpx
 
 from mixin.mixin_api import MixinApi
@@ -23,7 +16,7 @@ class TestMixinApi(object):
 
     @classmethod
     def setup_class(cls):
-        cls.bot = MixinBotApi(mixin_config)
+        cls.bot = MixinBotApi(mixin_config.config)
         cls.api = MixinApi('http://mixin-node0.exinpool.com:8239')
 
     @classmethod

@@ -1,19 +1,9 @@
 import os
 import json
 import time
-import ctypes
-import logging
-import uuid
-import base64
-import gzip
-import random
 import asyncio
-import threading
-from io import BytesIO
 import httpx
 
-from .mixin_bot_api import MixinBotApi
-from .import mixin_config
 from .import log
 from . import _mixin
 
@@ -26,7 +16,6 @@ class MixinApi(object):
 
     def __init__(self, url):
         self.node_url = url
-        self.api = MixinBotApi(mixin_config)
         self.client = httpx.AsyncClient()
         self.init()
 
