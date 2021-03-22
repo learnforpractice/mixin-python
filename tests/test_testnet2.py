@@ -69,7 +69,7 @@ class TestMixinApi(object):
             await asyncio.sleep(1.5)
             while True:
                 try:
-                    await cls.api.get_info()
+                    await api.get_info()
                     return
                 except Exception as e:
                     await asyncio.sleep(0.5)
