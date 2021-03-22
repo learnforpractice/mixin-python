@@ -7,6 +7,7 @@ import uuid
 import base64
 import gzip
 import random
+import asyncio
 import threading
 from io import BytesIO
 import httpx
@@ -238,6 +239,22 @@ class MixinApi(object):
     async def send_transaction(self, trx, accounts, input_index=0, seed=''):
         r = self.sign_transaction(trx, accounts, input_index, seed)
         return await self.send_raw_transaction(r['raw'])
+
+    async def wait_for_transaction(self, _hash, max_time=30.0):
+        end = time.monotonic() + max_time
+        while True:
+            if end <= time.monotonic():
+                raise Exception('wait timeout!')
+            try:
+                r = await self.get_transaction(_hash)
+                if not r:
+                    await asyncio.sleep(0.1)
+                    continue
+                if 'snapshot' in r:
+                    return r
+            except Exception as e:
+                logger.info(e)
+                await asyncio.sleep(0.1)
 
     async def get_info(self):
         data = {'method': 'getinfo', 'params': []}
