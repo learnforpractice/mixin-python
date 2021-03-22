@@ -1,6 +1,4 @@
 # Python Bindings for [ Mixin](https://github.com/mixinNetwork/mixin)
-
-
 <h3>
   <a
     target="_blank"
@@ -13,6 +11,7 @@
   </a>
 </h3>
 
+# [Releases](https://github.com/learnforpractice/mixin-python/releases/tag/v0.1)
 
 
 
@@ -20,7 +19,7 @@
 
 clang & go 1.16 & cmake
 
-## Ubuntu
+Ubuntu
 ```
 sudo apt install python3-dev
 sudo apt install python3-pip
@@ -33,19 +32,28 @@ sudo apt install cmake
 
 # Building
 
+### Download Source Code
+
 ```
 git clone https://github.com/learnforpractice/mixin-python --recursive
 cd mixin-python
 python3 -m pip install -r requirements-dev.txt 
 ```
 
-Linux
+### Update mixin-python Source Code
+
+```bash
+git pull
+git submodule update --init --recursive
+```
+
+### Build on Linux
 
 ```
 ./build-linux.sh
 ```
 
-macOS X
+### Build on macOS X
 
 ```
 ./build-mac.sh
@@ -57,7 +65,7 @@ macOS X
 python3 -m pip install dist/mixin-0.1.0-*
 ```
 
-### Install from prebuild package
+## Install from Prebuild Package
 
 Ubuntu python3.7
 ```bash
@@ -77,9 +85,18 @@ python3.7 -m pip install https://github.com/learnforpractice/mixin-python/releas
 # Quick Start
 
 ```python
+import asyncio
 from mixin.mixin_api import MixinApi
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
-api.create_address()
+addr = api.create_address()
+print(addr)
+
+async def get_info():
+  info = await api.get_info()
+  print(info)
+
+asyncio.run(get_info())
+
 ```
 
 ```
@@ -88,11 +105,7 @@ api.create_address()
      'spend_key': '02f0ea8504740a1c2916e1b9965c23c242aeeb02d093f3f1ed0e5e0d494bc603'}
 ```
 
-```
-api.get_info()
-```
-
-# Run mixin from Python
+# Run Mixin from Python
 
 ```bash
 python3 -m mixin.main kernel --dir config --port 9000
@@ -104,7 +117,21 @@ python3 -m mixin.main kernel --dir config --port 9000
 python3 tests/start_testnet.py
 ```
 
-# Run tests in jupyter notebook
+Connect to Local Testnet
+
+```python
+import asyncio
+from mixin.mixin_api import MixinApi
+api = MixinApi('http://127.0.0.1:8001')
+
+async def get_info():
+  info = await api.get_info()
+  print(info)
+
+asyncio.run(get_info())
+```
+
+# Run Tests in Jupyter Notebook
 ```bash
 python3 -m pip install notebook
 cd notebook
@@ -114,8 +141,9 @@ Open helloworld.ipynb, hit Ctrl+Enter to run the test code in cell
 
 Do not forget to run testnet.stop() to stop the testnet, otherwise the testnet processes will still running in the backgroud.
 
-# [Mixin API document](mixin_api.md)
+# [Mixin API Document](mixin_api.md)
 
+# [Mixin Bot API Document](mixin_bot_api.md)
 
 # Reference
 
@@ -124,3 +152,4 @@ https://github.com/wenewzhang/mixin-python3-sdk
 # License
 
 [GPL3.0](./LICENSE)
+
