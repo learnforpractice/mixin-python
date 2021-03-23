@@ -1,14 +1,19 @@
-# mixin api
+# MixinApi
 
 ## create_address
 
 ```python
+from mixin.mixin_api import MixinApi
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
 addr = api.create_address()
 print(addr)
 ```
 
 ## get_info
+
+```python
+async def get_info(self)
+```
 
 ```python
 from mixin.mixin_api import MixinApi
@@ -168,6 +173,16 @@ testnet.stop()
 
 ```
 
+## wait_for_transaction
+
+```python
+async def wait_for_transaction(self, _hash, max_time=30.0):
+```
+
+Example
+
+[See](#send_transaction)
+
 ## get_transaction
 ```python
 async def get_transaction(self, trx_hash)
@@ -246,7 +261,7 @@ async def get_utxo(self, hash, index)
 
 ## new_ghost_keys
 ```python
-def new_ghost_keys(self, seed, accounts, outputs)
+def new_ghost_keys(self, seed, accounts, output_index)
 ```
 
 ## sign_message
