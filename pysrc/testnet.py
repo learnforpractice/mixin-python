@@ -103,11 +103,11 @@ class MixinTestnet(object):
         nodes = json.dumps(nodes, indent=' ')
 
         self.config_dirs = []
-        if not os.path.exists('testnet'):
-            os.mkdir('testnet')
+        if not os.path.exists('.testnet'):
+            os.mkdir('.testnet')
         for i in range(self.node_count):
             port = 7001+i
-            temp_dir = os.path.join('testnet', f'config-{port}')
+            temp_dir = os.path.join('.testnet', f'config-{port}')
             self.config_dirs.append(temp_dir)
             if os.path.exists(temp_dir):
                 continue
@@ -140,7 +140,7 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
             node_addresses=self.node_addresses,
             config_dirs=self.config_dirs
         )
-        with open('testnet/testnet.json', 'w') as f:
+        with open('.testnet/testnet.json', 'w') as f:
             testnet_config = json.dumps(testnet_config, indent=' ')
             f.write(testnet_config)
 
@@ -172,21 +172,22 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
     def remove_all_config_dirs(self):
         self.config_dirs = []
         for port in range(7001, 7008):
-            temp_dir = os.path.join('testnet', f'config-{port}')
+            temp_dir = os.path.join('.testnet', f'config-{port}')
             self.config_dirs.append(temp_dir)
         self.cleanup()
 
     def start(self, new_testnet=True):
         if new_testnet:
             self.kill_all_nodes()
-            self.remove_all_config_dirs()
+            if os.path.exists('.testnet'):
+                shutil.rmtree('.testnet')
 
-        if os.path.exists('testnet/testnet.json'):
-            return self.restart('testnet/testnet.json')
+        if os.path.exists('.testnet/testnet.json'):
+            return self.restart('.testnet/testnet.json')
         self._create()
         self._start()
 
-    def restart(self, testnet_config_file='testnet/testnet.json'):
+    def restart(self, testnet_config_file='.testnet/testnet.json'):
         with open(testnet_config_file, 'r') as f:
             testnet_config = f.read()
             testnet_config = json.loads(testnet_config)
@@ -228,8 +229,8 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
         return r['hash']
 
     def cleanup(self):
-        if os.path.exists('testnet/testnet.json'):
-            os.remove('testnet/testnet.json')
+        if os.path.exists('.testnet/testnet.json'):
+            os.remove('.testnet/testnet.json')
 
         if self.config_dirs:
             for d in self.config_dirs:
