@@ -411,12 +411,12 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
-    def new_ghost_keys(self, seed, accounts, outputs):
+    def new_ghost_keys(self, seed, accounts, output_index):
         if isinstance(seed, bytes):
             seed = seed.hex()
         # assert len(seed) == 64, 'bad seed length'
         accounts = json.dumps(accounts)
-        ret = _mixin.new_ghost_keys(seed, accounts, outputs)
+        ret = _mixin.new_ghost_keys(seed, accounts, output_index)
         ret = json.loads(ret)
         if 'error' in ret:
             raise Exception(ret['error'])
