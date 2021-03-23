@@ -532,7 +532,7 @@ class TestMixinApi(object):
         
         r = await self.wait_for_transaction(deposit_hash)
         logger.info(r)
-        outputs = r['transaction']['outputs']
+        outputs = r['outputs']
         input_hash = deposit_hash
         for i in range(10):
             logger.info(f"+++++++++++++++transfer++++++++++++++++++++{i}")
@@ -566,7 +566,7 @@ class TestMixinApi(object):
             input_hash = await self.send_transaction(trx, [account])
             r = await self.wait_for_transaction(input_hash)
             # logger.info(r)
-            outputs = r['transaction']['outputs']
+            outputs = r['outputs']
 
     @pytest.mark.asyncio
     async def test_transfer_with_ghost_keys(self):
@@ -647,7 +647,7 @@ class TestMixinApi(object):
         
         r = await self.wait_for_transaction(deposit_hash)
         logger.info(r)
-        outputs = r['transaction']['outputs']
+        outputs = r['outputs']
         input_hash = deposit_hash
         for i in range(20):
             ghost_keys = self.api.new_ghost_keys('', [account['address']], 0)
@@ -683,7 +683,7 @@ class TestMixinApi(object):
             input_hash = await self.send_transaction(trx, [account])
             r = await self.wait_for_transaction(input_hash)
             # logger.info(r)
-            outputs = r['transaction']['outputs']
+            outputs = r['outputs']
             # logger.info('%s %s', ghost_keys, outputs)
 
     async def send_transaction(self, trx, accounts, input_index=0, seed=''):
