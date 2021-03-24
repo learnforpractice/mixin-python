@@ -24,6 +24,7 @@ cdef extern from "libmixin.h" nogil:
     int MixinMain(char* args)
     char* CreateAddress(char* _params);
     char* GetPublicKey(char* seed);
+    char* GenerateRandomSeed();
 
     char* DecodeAddress(char* _address);
     char* DecodeSignature(char* _signature);
@@ -78,6 +79,11 @@ def get_public_key(char* seed):
     cdef char *_ret
     _ret = GetPublicKey(seed)
     return convert(_ret)
+
+def generate_random_seed():
+    cdef char* ret
+    ret = GenerateRandomSeed()
+    return convert(ret)
 
 def decode_address(char* _address):
     cdef char *_ret

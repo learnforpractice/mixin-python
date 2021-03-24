@@ -35,7 +35,6 @@ setup(
         "PyJWT==1.7.1",
         "python-dateutil==2.7.5",
         "requests==2.21.0",
-        "websocket-client==0.54.0",
         "websockets",
         "httpx"
     ],

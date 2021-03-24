@@ -160,7 +160,7 @@ class TestMixinApi(object):
             'view_key': view_key,
             'spend_key': signer_key
         }
-        r = self.api.sign_transaction(trx, [domain_account], 0)
+        r = self.api.sign_transaction(trx, [domain_account])
         logger.info(self.api.decode_transaction(r['raw']))
         r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
@@ -245,8 +245,29 @@ class TestMixinApi(object):
         await self.send_transaction(trx, [account])
 
     @pytest.mark.asyncio
-    async def test_transfer(self):
-        trx_hash = 'ade6278a710712d5f3da4d8bef243b157a43463089b8fcc9a214811120268391'
+    async def test_transfer_with_multiple_input(self):
+
+        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+            for line in f:
+                key = 'signer-key = '
+                start = line.find(key)
+                if start >= 0:
+                    signer_key = line[len(key):]
+                    signer_key = signer_key.strip()
+                    signer_key = signer_key.replace('"', '')
+                    break
+
+        logger.info('++++signer_key: %s', signer_key)
+        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
+            nodes = f.read()
+            nodes = json.loads(nodes)
+            domain_node = nodes[0]
+        logger.info(domain_node)
+        domain_address = domain_node['signer']
+        decoded_addr = self.api.decode_address(domain_address)
+        view_key = decoded_addr['private_spend_key_derive']
+        view_key = view_key.strip()
+        logger.info('+++++view key: %s', view_key)
 
         account = {
             'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
@@ -259,12 +280,166 @@ class TestMixinApi(object):
             'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
             'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
         }
+        logger.info("+++++++++++++++deposit++++++++++++++++++++")
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [{
+                "deposit": {
+                "chain": "8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27",
+                "asset": "0xa974c709cfb4566686553a20790685a47aceaa33",
+                "transaction": "0x4cb581281f7115706c5e6f669371574bfdea317325e15eef32cd356df0d4789b",
+                "index": 0,
+                "amount": "100"
+                }
+            }],
+            "outputs": [
+                {
+                "amount": "100",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+        domain_account = {
+            'view_key': view_key,
+            'spend_key': signer_key
+        }
+        r = self.api.sign_transaction(trx, [domain_account])
+        # logger.info(r)
+        r = await self.api.send_raw_transaction(r['raw'])
+        # logger.info(r)
+        deposit_hash = r['hash']
+        
+        await self.wait_for_transaction(deposit_hash)
+
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [
+                {
+                "hash": deposit_hash,
+                "index": 0
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "51",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                },
+                {
+                "amount": "49",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+        r = await self.api.send_transaction(trx, [account])
+        await self.api.wait_for_transaction(r['hash'])
+
+        trx_hash = r['hash']
 
         trx = {
             "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
             "inputs": [
                 {
                 "hash": trx_hash,
+                "index": 0
+                },
+                {
+                "hash": trx_hash,
+                "index": 1
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "100",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+        r = await self.api.send_transaction(trx, [account])
+        r = await self.api.wait_for_transaction(r['hash'])
+        logger.info(r)
+
+    @pytest.mark.asyncio
+    async def test_transfer_with_multiple_input_with_different_keys(self):
+
+        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+            for line in f:
+                key = 'signer-key = '
+                start = line.find(key)
+                if start >= 0:
+                    signer_key = line[len(key):]
+                    signer_key = signer_key.strip()
+                    signer_key = signer_key.replace('"', '')
+                    break
+
+        logger.info('++++signer_key: %s', signer_key)
+        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
+            nodes = f.read()
+            nodes = json.loads(nodes)
+            domain_node = nodes[0]
+        logger.info(domain_node)
+        domain_address = domain_node['signer']
+        decoded_addr = self.api.decode_address(domain_address)
+        view_key = decoded_addr['private_spend_key_derive']
+        view_key = view_key.strip()
+        logger.info('+++++view key: %s', view_key)
+
+        account = {
+            'address': 'XINFrqT5x74BVvtgLJEVhRhFc1GdJ3vmwiu7zJHVg7qjYvzx9wG7j1sENkXV7NfN9tQm1SsRNces7tcrxFas9nkr5H1B7HTm',
+            'view_key': 'bd1a337f2319d502eb062a433cb79cf8e2daadd6bcd0bb2a21d4b073549cb30c',
+            'spend_key': 'bd449970bdb5cf9afaf1f9c574a94f06ff7a0d3af0d9387867e1ba7e9193eb03'
+        }
+
+        account2 = {
+            'address': 'XINHJLCRBWJ3AgcrNhKppVMvjinapzumLVL253opKzs6Jk5bUBHWKH6paPr2exhwqYZ3FcPtbnitJMF6TXk8UcEx8u2nUt4S',
+            'view_key': 'fae95f3dfaf0a7b2f4ca95d6ed94f8002492875e018000f786284be1beacf10c',
+            'spend_key': '0ff0016d98026b21df80f4b1fe0db5fc460e7e66f47f67acfd773e5cc4fbb207'
+        }
+        logger.info("+++++++++++++++deposit++++++++++++++++++++")
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [{
+                "deposit": {
+                "chain": "8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27",
+                "asset": "0xa974c709cfb4566686553a20790685a47aceaa33",
+                "transaction": "0x4cb581281f7115706c5e6f669371574bfdea317325e15eef32cd356df0d4789b",
+                "index": 0,
+                "amount": "100"
+                }
+            }],
+            "outputs": [
+                {
+                "amount": "100",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+        domain_account = {
+            'view_key': view_key,
+            'spend_key': signer_key
+        }
+        r = self.api.sign_transaction(trx, [domain_account])
+        # logger.info(r)
+        r = await self.api.send_raw_transaction(r['raw'])
+        # logger.info(r)
+        deposit_hash = r['hash']
+        
+        await self.wait_for_transaction(deposit_hash)
+
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [
+                {
+                "hash": deposit_hash,
                 "index": 0
                 }
             ],
@@ -283,9 +458,47 @@ class TestMixinApi(object):
                 }
             ]
         }
-        r = self.api.sign_transaction(trx, [account], 0)
+        r = await self.api.send_transaction(trx, [account])
+        await self.api.wait_for_transaction(r['hash'])
+
+        trx_hash = r['hash']
+
+        trx = {
+            "asset": "a99c2e0e2b1da4d648755ef19bd95139acbbe6564cfb06dec7cd34931ca72cdc",
+            "inputs": [
+                {
+                "hash": trx_hash,
+                "index": 0
+                },
+                {
+                "hash": trx_hash,
+                "index": 1
+                }
+            ],
+            "outputs": [
+                {
+                "amount": "100",
+                "accounts": [account['address']],
+                "script": "fffe01",
+                "type": 0
+                }
+            ]
+        }
+
+        signatures = []
+        seed = self.api.generate_random_seed()
+        logger.info(seed)
+        r = self.api.sign_transaction(trx, [account], [0], seed=seed)
+        signatures.append(r['signatures'][0])
+
+        r = self.api.sign_transaction(trx, [account2], [1], seed=seed)
+        signatures.append(r['signatures'][0])
+
+        raw = self.api.add_signatures_to_raw_transaction(r['raw'], signatures)
+        r = self.api.decode_transaction(raw)
         logger.info(r)
-        r = await self.api.send_raw_transaction(r['raw'])
+        r = await self.api.send_raw_transaction(raw)
+        r = await self.api.wait_for_transaction(r['hash'])
         logger.info(r)
 
     @pytest.mark.asyncio
@@ -414,7 +627,7 @@ class TestMixinApi(object):
             'view_key': view_key,
             'spend_key': signer_key
         }
-        r = self.api.sign_transaction(trx, [domain_account], 0, '')
+        r = self.api.sign_transaction(trx, [domain_account])
         # logger.info(r)
         r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
@@ -639,7 +852,7 @@ class TestMixinApi(object):
             'view_key': view_key,
             'spend_key': signer_key
         }
-        r = self.api.sign_transaction(trx, [domain_account], 0)
+        r = self.api.sign_transaction(trx, [domain_account])
         # logger.info(r)
         r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
@@ -686,11 +899,11 @@ class TestMixinApi(object):
             outputs = r['outputs']
             # logger.info('%s %s', ghost_keys, outputs)
 
-    async def send_transaction(self, trx, accounts, input_index=0, seed=''):
+    async def send_transaction(self, trx, accounts):
         for i in range(5):
             # self.api.set_node(f'http://127.0.0.1:8007')
             try:
-                r = await self.api.send_transaction(trx, accounts, input_index, seed)
+                r = await self.api.send_transaction(trx, accounts)
                 return r['hash']
                 break
             except Exception as e:
@@ -794,7 +1007,7 @@ class TestMixinApi(object):
             'view_key': view_key,
             'spend_key': signer_key
         }
-        r = self.api.sign_transaction(trx, [domain_account], 0)
+        r = self.api.sign_transaction(trx, [domain_account])
         # logger.info(r)
         r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
@@ -867,7 +1080,7 @@ class TestMixinApi(object):
             # "-": ""
 #            "Node":
         }
-        r = self.api.sign_transaction(trx, accounts, 0)
+        r = self.api.sign_transaction(trx, accounts)
         raw = r['raw']
         signatures = r['signatures']
         r = await self.api.send_raw_transaction(raw)
@@ -962,7 +1175,7 @@ class TestMixinApi(object):
             'view_key': view_key,
             'spend_key': signer_key
         }
-        r = self.api.sign_transaction(trx, [domain_account], 0)
+        r = self.api.sign_transaction(trx, [domain_account])
         # logger.info(r)
         r = await self.api.send_raw_transaction(r['raw'])
         # logger.info(r)
@@ -1046,7 +1259,7 @@ class TestMixinApi(object):
             # "-": ""
 #            "Node":
         }
-        r = self.api.sign_transaction(trx, [], 0)
+        r = self.api.sign_transaction(trx, [])
         raw = r['raw']
         signatures = r['signatures']
 

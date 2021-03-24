@@ -31,7 +31,7 @@ class TestMixinApi(object):
             await asyncio.sleep(2)
             while True:
                 try:
-                    await cls.api.get_info()
+                    await api.get_info()
                     return
                 except Exception as e:
                     await asyncio.sleep(0.5)
@@ -169,7 +169,7 @@ class TestMixinApi(object):
 
         for i in range(10):
             try:
-                r = self.api.sign_transaction(trx, [account], 0)
+                r = self.api.sign_transaction(trx, [account])
                 # logger.info(r)
                 transfer_ret = await self.api.send_raw_transaction(r['raw'])
                 break
@@ -223,7 +223,7 @@ class TestMixinApi(object):
         await asyncio.sleep(2.0)
         for i in range(10):
             try:
-                r = self.api.sign_transaction(trx, [account], 0)
+                r = self.api.sign_transaction(trx, [account])
                 # logger.info(r)
                 transfer_ret = await self.api.send_raw_transaction(r['raw'])
                 break

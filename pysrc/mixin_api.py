@@ -47,6 +47,9 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
+    def generate_random_seed(self):
+        return _mixin.generate_random_seed()
+
     def decode_address(self, addr):
         '''
         Example:
@@ -162,7 +165,7 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
-    def sign_transaction(self, trx, accounts, input_index=0, seed=''):
+    def sign_transaction(self, trx, accounts, input_indexes=[0], seed=''):
         '''
         type signerInput struct {
             Inputs []struct {
@@ -205,7 +208,7 @@ class MixinApi(object):
             "seed": seed,
             "keys": keys,
             "raw": trx,
-            "input_index": input_index
+            "input_indexes": input_indexes
         }
 
         params["node"] = self.node_url
@@ -228,8 +231,9 @@ class MixinApi(object):
             raise Exception(r['error'])
         return r['data']
 
-    async def send_transaction(self, trx, accounts, input_index=0, seed=''):
-        r = self.sign_transaction(trx, accounts, input_index, seed)
+    async def send_transaction(self, trx, accounts, seed=''):
+        input_indexes = [i for i in range(len(trx['inputs']))]
+        r = self.sign_transaction(trx, accounts, input_indexes, seed)
         return await self.send_raw_transaction(r['raw'])
 
     async def wait_for_transaction(self, _hash, max_time=30.0):

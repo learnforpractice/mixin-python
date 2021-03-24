@@ -222,7 +222,7 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
         }
 
         address = self.node_addresses[0]['signer']
-        r = self.api.sign_transaction(trx, [address], 0)
+        r = self.api.sign_transaction(trx, [address])
         r = await self.api.send_raw_transaction(r['raw'])
         logger.info('deposit hash %s', r['hash'])
         self.deposit_hash = r['hash']

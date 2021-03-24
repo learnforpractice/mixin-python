@@ -27,7 +27,7 @@ print(info)
 ## sign_transaction
 
 ```python
-def sign_transaction(self, trx, accounts, input_index=0, seed='')
+def sign_transaction(self, trx, accounts, input_indexes=[0], seed='')
 ```
 
 Example
@@ -67,7 +67,7 @@ trx = {
     ]
 }
 
-ret = api.sign_transaction(trx, [account], 0)
+ret = api.sign_transaction(trx, [account])
 print(ret['raw'])
 print(ret['signatures'])
 
@@ -116,7 +116,7 @@ trx = {
     ]
 }
 
-ret = api.sign_transaction(trx, [account], 0)
+ret = api.sign_transaction(trx, [account])
 print(ret['raw'])
 print(ret['signatures'])
 ret = await api.send_raw_transaction(ret['raw'])
@@ -128,7 +128,7 @@ testnet.stop()
 ## send_transaction
 
 ```python
-async def send_transaction(self, trx, accounts, input_index=0, seed='')
+async def send_transaction(self, trx, accounts, seed='')
 ```
 
 ```python
@@ -166,7 +166,7 @@ trx = {
     ]
 }
 
-ret = await api.send_transaction(trx, [account], 0)
+ret = await api.send_transaction(trx, [account])
 print(ret['hash'])
 
 testnet.stop()
@@ -176,12 +176,12 @@ testnet.stop()
 ## wait_for_transaction
 
 ```python
-async def wait_for_transaction(self, _hash, max_time=30.0):
+async def wait_for_transaction(self, _hash, max_time=30.0)
 ```
 
 Example
 
-[See](#send_transaction)
+[See send_transaction](#send_transaction)
 
 ## get_transaction
 ```python
