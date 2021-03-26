@@ -241,16 +241,13 @@ class MixinApi(object):
         while True:
             if end <= time.monotonic():
                 raise Exception('wait timeout!')
-            try:
-                r = await self.get_transaction(_hash)
-                if not r:
-                    await asyncio.sleep(0.1)
-                    continue
-                if 'snapshot' in r:
-                    return r
-            except Exception as e:
-                logger.info(e)
+
+            r = await self.get_transaction(_hash)
+            if not r:
                 await asyncio.sleep(0.1)
+                continue
+            if 'snapshot' in r:
+                return r
 
     async def get_info(self):
         data = {'method': 'getinfo', 'params': []}

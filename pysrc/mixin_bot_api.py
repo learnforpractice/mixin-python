@@ -142,7 +142,7 @@ class MixinBotApi:
 
         result_obj = r.json()
         # print(result_obj)
-        return result_obj['data']
+        return result_obj
 
     async def __genPostRequest(self, path, body, auth_token=""):
         """
