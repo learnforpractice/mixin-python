@@ -88,7 +88,7 @@ class MixinBotApi:
         encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
         return encoded
 
-    def gen_encryped_pin(self, iterString = None):
+    def gen_encrypted_pin(self, iterString = None):
         if self.keyForAES == "":
             privKeyObj = RSA.importKey(self.private_key)
 
@@ -163,6 +163,9 @@ class MixinBotApi:
         # print(result_obj)
         return result_obj
 
+    async def get(self, path, body=None, auth_token=""):
+        return await self.__genNetworkGetRequest(path, body, auth_token)
+
     async def __genNetworkGetRequest(self, path, body=None, auth_token=""):
         """
         generate Mixin Network GET http request
@@ -181,6 +184,9 @@ class MixinBotApi:
         r = await self.client.get(url, headers={"Authorization": "Bearer " + auth_token})
         result_obj = r.json()
         return result_obj
+
+    async def post(self, path, body, auth_token=""):
+        return await self.__genNetworkPostRequest(path, body, auth_token)
 
     # TODO: request
     async def __genNetworkPostRequest(self, path, body, auth_token=""):
@@ -224,14 +230,11 @@ class MixinBotApi:
         """
         return await self.__genGetRequest('/assets', auth_token)
 
-    async def post_request(self, path, body):
-        return await self.__genNetworkPostRequest(path, body)
-
     async def get_ghost_keys(self, user_id):
         body = {"index":0, "receivers":[user_id]}
         return await self.post_request('/outputs', body)
 
-    async def get_multi_signs(self):
+    async def get_multisigs(self):
         return await self.__genNetworkGetRequest('/multisigs?limit=500')
 
     async def get_my_profile(self, auth_token):
@@ -332,7 +335,7 @@ class MixinBotApi:
         """
         old_inside_pay_pin = self.pay_pin
         self.pay_pin = new_pin
-        newEncrypedPin = self.gen_encryped_pin()
+        newEncrypedPin = self.gen_encrypted_pin()
         if old_pin == "":
             body = {
                 "old_pin": "",
@@ -341,7 +344,7 @@ class MixinBotApi:
         else:
 
             self.pay_pin = old_pin
-            oldEncryptedPin = self.gen_encryped_pin()
+            oldEncryptedPin = self.gen_encrypted_pin()
             body = {
                 "old_pin": oldEncryptedPin.decode(),
                 "pin": newEncrypedPin.decode()
@@ -355,7 +358,7 @@ class MixinBotApi:
         if auth_token is empty, it verify robot' pin.
         if auth_token is set, it verify messenger user pin.
         """
-        enPin = self.gen_encryped_pin()
+        enPin = self.gen_encrypted_pin()
         body = {
             "pin": enPin.decode()
         }
@@ -373,7 +376,7 @@ class MixinBotApi:
         withdrawals robot asset to address_id
         Tips:Get assets out of Mixin Network, neet to create an address for withdrawal.
         """
-        encrypted_pin = self.gen_encryped_pin()
+        encrypted_pin = self.gen_encrypted_pin()
 
         if trace_id == "":
             trace_id = str(uuid.uuid1())
@@ -395,7 +398,7 @@ class MixinBotApi:
         """
         body = {
             "asset_id": asset_id,
-            "pin": self.gen_encryped_pin().decode(),
+            "pin": self.gen_encrypted_pin().decode(),
             "public_key": public_key,
             "label": label,
             "account_name": account_name,
@@ -407,7 +410,7 @@ class MixinBotApi:
         """
         Delete an address by ID.
         """
-        encrypted_pin = self.gen_encryped_pin().decode()
+        encrypted_pin = self.gen_encrypted_pin().decode()
 
         body = {"pin": encrypted_pin}
 
@@ -424,7 +427,7 @@ class MixinBotApi:
         Transfer of assets between Mixin Network users.
         """
         # generate encrypted pin
-        encrypted_pin = self.gen_encryped_pin()
+        encrypted_pin = self.gen_encrypted_pin()
 
         body = {'asset_id': to_asset_id, 'counter_user_id': to_user_id, 'amount': str(to_asset_amount),
                 'pin': encrypted_pin.decode('utf8'), 'trace_id': trace_uuid, 'memo': memo}
