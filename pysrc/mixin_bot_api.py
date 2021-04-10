@@ -31,7 +31,7 @@ class MixinBotApi:
 
         # robot's config
         self.client_id = mixin_config['client_id']
-        self.client_secret = mixin_config['client_secret']
+        # self.client_secret = mixin_config['client_secret']
         self.pay_session_id = mixin_config['session_id']
         self.pay_pin = mixin_config['pin']
         self.pin_token = mixin_config['pin_token']
@@ -140,9 +140,11 @@ class MixinBotApi:
         else:
             r = await self.client.get(url, headers={"Authorization": "Bearer " + auth_token})
 
-        result_obj = r.json()
+        r = r.json()
+        if 'error' in r:
+            raise Exception(r['error'])
         # print(result_obj)
-        return result_obj
+        return r['data']
 
     async def __genPostRequest(self, path, body, auth_token=""):
         """
