@@ -14,7 +14,7 @@ EOS_CHAIN_ID = '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d
 
 class MixinApi(object):
 
-    def __init__(self, url):
+    def __init__(self, url='http://127.0.0.1:8001'):
         self.node_url = url
         self.client = httpx.AsyncClient()
         self.init()
@@ -241,16 +241,13 @@ class MixinApi(object):
         while True:
             if end <= time.monotonic():
                 raise Exception('wait timeout!')
-            try:
-                r = await self.get_transaction(_hash)
-                if not r:
-                    await asyncio.sleep(0.1)
-                    continue
-                if 'snapshot' in r:
-                    return r
-            except Exception as e:
-                logger.info(e)
+
+            r = await self.get_transaction(_hash)
+            if not r:
                 await asyncio.sleep(0.1)
+                continue
+            if 'snapshot' in r:
+                return r
 
     async def get_info(self):
         data = {'method': 'getinfo', 'params': []}
@@ -360,8 +357,8 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return ret['data']
 
-    def sign_message(self, key, msg):
-        ret = _mixin.sign_message(key, msg)
+    def sign_message(self, private_key, msg):
+        ret = _mixin.sign_message(private_key, msg)
         ret = json.loads(ret)
         if 'error' in ret:
             raise Exception(ret['error'])

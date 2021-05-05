@@ -18,15 +18,15 @@ from mixin import log
 
 logger = log.get_logger(__name__)
 
-class MIXIN_WS_API:
+class MixinWSApi:
 
-    def __init__(self, on_message):
-        self.mixin_bot = MixinBotApi(mixin_config.config)
+    def __init__(self, bot_config, on_message):
+        self.bot = MixinBotApi(bot_config)
         self.ws = None
         self.on_message = on_message
 
     async def connect(self):
-        encoded = self.mixin_bot.genGETJwtToken('/', "", str(uuid.uuid4()))
+        encoded = self.bot.gen_get_jwt_token('/', "", str(uuid.uuid4()))
 
         uri = "wss://blaze.mixin.one"
         #uri = 'wss://echo.websocket.org'
