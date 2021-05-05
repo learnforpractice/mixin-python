@@ -215,11 +215,11 @@ class MixinBotApi:
 
         # r = requests.post(url, data=body, headers=headers)
 # {'error': {'status': 202, 'code': 401, 'description': 'Unauthorized, maybe invalid token.'}}
-        result_obj = r.json()
-        if 'error' in result_obj:
+        r = r.json()
+        if 'error' in r:
             raise Exception(result_obj['error'])
         # print(result_obj)
-        return result_obj
+        return r['data']
 
     """
     ============
@@ -235,8 +235,12 @@ class MixinBotApi:
         """
         return await self.__genGetRequest('/assets', auth_token)
 
-    async def get_ghost_keys(self, user_ids, index=0):
-        body = {"index": index, "receivers": user_ids}
+    async def get_ghost_keys(self, user_ids, index=0, hint=''):
+        body = {
+            "index": index,
+            "receivers": user_ids,
+            "hint": hint
+        }
         return await self.post('/outputs', body)
 
     async def get_multisigs(self):
