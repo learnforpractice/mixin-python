@@ -196,25 +196,28 @@ class MixinBotApi:
         generate Mixin Network POST http request
         """
         # transfer obj => json string
-        body_in_json = json.dumps(body)
-
+        if isinstance(body, dict):
+            body = json.dumps(body)
         # generate robot's auth token
         if auth_token == "":
-            token = self.gen_post_jwt_token(path, body_in_json, str(uuid.uuid4()))
+            token = self.gen_post_jwt_token(path, body, str(uuid.uuid4()))
             auth_token = token.decode('utf8')
         headers = {
             'Content-Type'  : 'application/json',
             'Authorization' : 'Bearer ' + auth_token,
+            "X-Request-Id": str(uuid.uuid4()),
         }
         # generate url
         url = self.__genUrl(path)
 #        print(url, body)
-        r = await self.client.post(url, json=body, headers=headers)
+        r = await self.client.post(url, data=body, headers=headers)
 # {'error': {'status': 202, 'code': 20118, 'description': 'Invalid PIN format.'}}
 
         # r = requests.post(url, data=body, headers=headers)
 # {'error': {'status': 202, 'code': 401, 'description': 'Unauthorized, maybe invalid token.'}}
         result_obj = r.json()
+        if 'error' in result_obj:
+            raise Exception(result_obj['error'])
         # print(result_obj)
         return result_obj
 
@@ -232,9 +235,9 @@ class MixinBotApi:
         """
         return await self.__genGetRequest('/assets', auth_token)
 
-    async def get_ghost_keys(self, user_id):
-        body = {"index":0, "receivers":[user_id]}
-        return await self.post_request('/outputs', body)
+    async def get_ghost_keys(self, user_ids, index=0):
+        body = {"index": index, "receivers": user_ids}
+        return await self.post('/outputs', body)
 
     async def get_multisigs(self):
         return await self.__genNetworkGetRequest('/multisigs?limit=500')
