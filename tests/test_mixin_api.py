@@ -6,7 +6,6 @@ import uuid
 import httpx
 
 from mixin.mixin_api import MixinApi
-from mixin.mixin_bot_api import MixinBotApi
 from mixin import mixin_config
 from mixin import log
 
@@ -16,7 +15,6 @@ class TestMixinApi(object):
 
     @classmethod
     def setup_class(cls):
-        cls.bot = MixinBotApi(mixin_config.config)
         cls.api = MixinApi('http://mixin-node0.exinpool.com:8239')
 
     @classmethod
@@ -298,9 +296,3 @@ class TestMixinApi(object):
         print('++++++=test_async')
         async with httpx.AsyncClient() as client:
             response = await client.get("http://www.google.com")
-
-    @pytest.mark.asyncio
-    async def test_gen_pin(self):
-        r = await self.bot.verifyPin()
-        assert not 'error' in r
-        logger.info(r)
