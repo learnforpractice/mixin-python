@@ -121,7 +121,7 @@ class MixinBotApi:
         msg = iv + encrypted_result
         encrypted_pin = base64.b64encode(msg)
 
-        return encrypted_pin
+        return encrypted_pin.decode()
 
     def __genUrl(self, path):
         """
@@ -217,7 +217,7 @@ class MixinBotApi:
 # {'error': {'status': 202, 'code': 401, 'description': 'Unauthorized, maybe invalid token.'}}
         r = r.json()
         if 'error' in r:
-            raise Exception(result_obj['error'])
+            raise Exception(r['error'])
         # print(result_obj)
         return r['data']
 
@@ -246,7 +246,7 @@ class MixinBotApi:
     async def get_multisigs(self):
         return await self.__genNetworkGetRequest('/multisigs?limit=500')
 
-    async def get_my_profile(self, auth_token):
+    async def get_my_profile(self, auth_token=''):
         """
         Read self profile.
         """
@@ -348,15 +348,15 @@ class MixinBotApi:
         if old_pin == "":
             body = {
                 "old_pin": "",
-                "pin": newEncrypedPin.decode()
+                "pin": newEncrypedPin
             }
         else:
 
             self.pay_pin = old_pin
             oldEncryptedPin = self.gen_encrypted_pin()
             body = {
-                "old_pin": oldEncryptedPin.decode(),
-                "pin": newEncrypedPin.decode()
+                "old_pin": oldEncryptedPin,
+                "pin": newEncrypedPin
             }
         self.pay_pin = old_inside_pay_pin
         return await self.__genNetworkPostRequest('/pin/update', body, auth_token)
@@ -369,7 +369,7 @@ class MixinBotApi:
         """
         enPin = self.gen_encrypted_pin()
         body = {
-            "pin": enPin.decode()
+            "pin": enPin
         }
 
         return await self.__genNetworkPostRequest('/pin/verify', body, auth_token)
@@ -407,7 +407,7 @@ class MixinBotApi:
         """
         body = {
             "asset_id": asset_id,
-            "pin": self.gen_encrypted_pin().decode(),
+            "pin": self.gen_encrypted_pin(),
             "public_key": public_key,
             "label": label,
             "account_name": account_name,
@@ -419,7 +419,7 @@ class MixinBotApi:
         """
         Delete an address by ID.
         """
-        encrypted_pin = self.gen_encrypted_pin().decode()
+        encrypted_pin = self.gen_encrypted_pin()
 
         body = {"pin": encrypted_pin}
 
@@ -439,7 +439,7 @@ class MixinBotApi:
         encrypted_pin = self.gen_encrypted_pin()
 
         body = {'asset_id': to_asset_id, 'counter_user_id': to_user_id, 'amount': str(to_asset_amount),
-                'pin': encrypted_pin.decode('utf8'), 'trace_id': trace_uuid, 'memo': memo}
+                'pin': encrypted_pin, 'trace_id': trace_uuid, 'memo': memo}
         if trace_uuid == "":
             body['trace_id'] = str(uuid.uuid1())
 
