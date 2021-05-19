@@ -12,6 +12,11 @@ logger = log.get_logger(__name__)
 ETH_CHAIN_ID = '8dd50817c082cdcdd6f167514928767a4b52426997bd6d4930eca101c5ff8a27'
 EOS_CHAIN_ID = '6ac4cbffda9952e7f0d924e4cfb6beb29d21854ac00bfbf749f086302d0f7e5d'
 
+def check_result(ret):
+    if 'error' in ret:
+        raise Exception(ret['error'])
+    return json.loads(ret['data'])
+
 class MixinApi(object):
 
     def __init__(self, url='http://127.0.0.1:8001'):
@@ -88,7 +93,7 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return json.loads(ret['data'])
 
-    def encode_transaction(self, trx, signs):
+    def encode_transaction(self, trx, signs=[]):
         if isinstance(trx, dict):
             trx = json.dumps(trx)
         signs = json.dumps(signs)
@@ -422,3 +427,7 @@ class MixinApi(object):
         if 'error' in ret:
             raise Exception(ret['error'])
         return json.loads(ret['data'])
+
+    def get_top_tokens(self):
+        ret = await mixin_bot.get('/network/assets/top')
+        return check_result(ret)
