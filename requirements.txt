@@ -4,4 +4,4 @@ PyJWT==1.7.1
 python-dateutil==2.7.5
 requests==2.21.0
 websockets==8.1
-
+cryptography
