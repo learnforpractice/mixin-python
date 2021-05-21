@@ -428,6 +428,6 @@ class MixinApi(object):
             raise Exception(ret['error'])
         return json.loads(ret['data'])
 
-    def get_top_tokens(self):
-        ret = await mixin_bot.get('/network/assets/top')
+    async def get_top_tokens(self):
+        ret = await self.client.get('/network/assets/top')
         return check_result(ret)
