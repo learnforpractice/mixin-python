@@ -115,7 +115,7 @@ class MixinWSApi:
     ACKNOWLEDGE_MESSAGE_RECEIPT ack server received message
     """
 
-    async def replayMessage(self, msgid):
+    async def echoMessage(self, msgid):
         parameter4IncomingMsg = {"message_id": msgid, "status": "READ"}
         Message = {"id": str(uuid.uuid1()), "action": "ACKNOWLEDGE_MESSAGE_RECEIPT", "params": parameter4IncomingMsg}
         Message_instring = json.dumps(Message)
