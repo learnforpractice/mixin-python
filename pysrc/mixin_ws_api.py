@@ -31,7 +31,7 @@ class MixinWSApi:
 
         uri = "wss://blaze.mixin.one"
         #uri = 'wss://echo.websocket.org'
-        headers={"Authorization": "Bearer " + encoded.decode()}
+        headers={"Authorization": "Bearer " + encoded}
         self.ws = await websockets.connect(uri, subprotocols=["Mixin-Blaze-1"], extra_headers=headers)
 
     """

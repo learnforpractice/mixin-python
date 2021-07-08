@@ -9,20 +9,25 @@ code by lee.c
 update at 2018.12.2
 """
 
-from Crypto.PublicKey import RSA
-import base64
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Signature import PKCS1_v1_5
-import Crypto
 import time
-from Crypto import Random
-from Crypto.Cipher import AES
+import base64
 import hashlib
 import datetime
-import jwt
 import uuid
 import json
+
+import jwt
+import Crypto
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Signature import PKCS1_v1_5
+from Crypto import Random
+from Crypto.Cipher import AES
 from urllib.parse import urlencode
+
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives import serialization
+
 
 import httpx
 
@@ -37,6 +42,12 @@ class MixinBotApi:
         self.pin_token = mixin_config['pin_token']
         self.private_key = mixin_config['private_key']
 
+        if self.private_key.find('RSA PRIVATE KEY') >= 0:
+            self.algorithm='RS512'
+        else:
+            self.algorithm = 'EdDSA'
+            self.private_key = self.decode_ed25519(self.private_key)
+
         self.client = httpx.AsyncClient()
 
         self.keyForAES = ""
@@ -44,9 +55,11 @@ class MixinBotApi:
         self.api_base_url = 'https://api.mixin.one'
         #self.api_base_url = 'https://mixin-api.zeromesh.net'
 
-    """
-    BASE METHON
-    """
+    def decode_ed25519(cls, priv):
+        if not len(priv) % 4 == 0:
+            priv = priv + '===='
+        priv = base64.b64decode(priv, altchars='-_')
+        return ed25519.Ed25519PrivateKey.from_private_bytes(priv[:32])
 
     def generate_sig(self, method, uri, body):
         hashresult = hashlib.sha256((method + uri+body).encode('utf-8')).hexdigest()
@@ -66,7 +79,7 @@ class MixinBotApi:
         jwtSig = self.gen_get_sig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
+        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
 
         return encoded
 
@@ -74,7 +87,7 @@ class MixinBotApi:
         jwtSig = self.gen_get_sig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
+        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
         privKeyObj = RSA.importKey(self.private_key)
         signer = PKCS1_v1_5.new(privKeyObj)
         signature = signer.sign(encoded)
@@ -85,7 +98,7 @@ class MixinBotApi:
         jwtSig = self.genPOSTSig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm='RS512')
+        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
         return encoded
 
     def gen_encrypted_pin(self, iterString = None):
@@ -179,9 +192,8 @@ class MixinBotApi:
         else:
             body = ""
 
-        if auth_token == "":
-            token = self.gen_get_jwt_token(path, body, str(uuid.uuid4()))
-            auth_token = token.decode('utf8')
+        if not auth_token:
+            auth_token = self.gen_get_jwt_token(path, body, str(uuid.uuid4()))
 
         r = await self.client.get(url, headers={"Authorization": "Bearer " + auth_token})
         result_obj = r.json()

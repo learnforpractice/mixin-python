@@ -32,10 +32,11 @@ setup(
     install_requires=[
         "pycparser==2.19",
         "pycryptodome==3.7.2",
-        "PyJWT==1.7.1",
+        "PyJWT==2.1.0",
         "python-dateutil==2.7.5",
         "requests==2.21.0",
         "websockets",
+        "cryptography==3.4.7",
         "httpx"
     ],
     tests_require=['pytest'],
