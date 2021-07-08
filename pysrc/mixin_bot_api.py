@@ -332,14 +332,13 @@ class MixinBotApi:
             "user_id": user_id
         }
 
-        return await self.__genPostRequest('/conversations', body, auth_token)
+        return await self.post('/conversations', body, auth_token)
 
-    async def get_conv(self, conversation_id, auth_token):
+    async def get_conv(self, conversation_id, auth_token=None):
         """
         Read conversation by conversation_id.
         """
-        return await self.__genGetRequest('/conversations/' + conversation_id, auth_token)
-
+        return await self.get(f'/conversations/{conversation_id}', auth_token)
 
     """
     ============
