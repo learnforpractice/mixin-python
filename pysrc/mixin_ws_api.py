@@ -20,13 +20,12 @@ logger = log.get_logger(__name__)
 
 class MixinWSApi:
 
-    def __init__(self, config, on_message):
-        self.bot = MixinBotApi(config)
+    def __init__(self, bot_config, on_message):
+        self.bot = MixinBotApi(bot_config)
         self.ws = None
         self.on_message = on_message
 
     async def connect(self):
-        logger.info('+++++connecting...')
         encoded = self.bot.gen_get_jwt_token('/', "", str(uuid.uuid4()))
 
         uri = "wss://blaze.mixin.one"
