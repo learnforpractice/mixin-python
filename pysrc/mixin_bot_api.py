@@ -8,7 +8,7 @@ env: python 3.x
 code by lee.c
 update at 2018.12.2
 """
-
+from typing import Union
 import time
 import base64
 import hashlib
@@ -58,7 +58,7 @@ class MixinBotApi:
     def decode_ed25519(cls, priv):
         if not len(priv) % 4 == 0:
             priv = priv + '===='
-        priv = base64.b64decode(priv, altchars='-_')
+        priv = base64.b64decode(priv, altchars=b'-_')
         return ed25519.Ed25519PrivateKey.from_private_bytes(priv[:32])
 
     def generate_sig(self, method, uri, body):
@@ -212,8 +212,7 @@ class MixinBotApi:
             body = json.dumps(body)
         # generate robot's auth token
         if auth_token == "":
-            token = self.gen_post_jwt_token(path, body, str(uuid.uuid4()))
-            auth_token = token.decode('utf8')
+            auth_token = self.gen_post_jwt_token(path, body, str(uuid.uuid4()))
         headers = {
             'Content-Type'  : 'application/json',
             'Authorization' : 'Bearer ' + auth_token,
@@ -339,6 +338,51 @@ class MixinBotApi:
         Read conversation by conversation_id.
         """
         return await self.get(f'/conversations/{conversation_id}', auth_token)
+
+    async def send_message(self, conversation_id: str, category: str, data: str):
+        if isinstance(data, str):
+            data = data.encode()
+        params = {
+            "conversation_id": conversation_id,
+            "category": category,
+            "status": "SENT",
+            "message_id": str(uuid.uuid4()),
+            "data": base64.b64encode(data).decode().strip('=')
+        }
+        return await self.post('/messages', params)
+
+    async def send_text_message(self, conversation_id: str, data: Union[str, bytes]):
+        return await self.send_message(conversation_id, "PLAIN_TEXT", data)
+
+    async def send_sticker_message(self, conversation_id: str, sticker_id: str):
+        data = {
+            "sticker_id": sticker_id
+        }
+        data = json.dumps(data)
+        return await self.send_message(conversation_id, "PLAIN_STICKER", data)
+
+    async def send_contract_message(self, conversation_id: str, user_id: str):
+        data = {
+            "user_id": user_id
+        }
+        data = json.dumps(data)
+        return await self.send_message(conversation_id, "PLAIN_STICKER", data)
+
+    async def send_contract_message(self, conversation_id: str, user_id: str):
+        data = {
+            "user_id": user_id
+        }
+        data = json.dumps(data)
+        return await self.send_message(conversation_id, "PLAIN_CONTACT", data)
+
+    async def send_button_group_message(self, conversation_id: str, label: str, color: str, action: str):
+        data = {
+            "action": action,
+            "color": color,
+            "label": label
+        }
+        data = json.dumps(data)
+        return await self.send_message(conversation_id, "APP_BUTTON_GROUP", data)
 
     """
     ============
