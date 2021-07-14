@@ -8,7 +8,7 @@ env: python 3.x
 code by lee.c
 update at 2018.12.2
 """
-from typing import Union
+from typing import Union, List
 import time
 import base64
 import hashlib
@@ -28,6 +28,7 @@ from urllib.parse import urlencode
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 
+from .message_types import Button
 
 import httpx
 
@@ -208,7 +209,7 @@ class MixinBotApi:
         generate Mixin Network POST http request
         """
         # transfer obj => json string
-        if isinstance(body, dict):
+        if isinstance(body, (dict, list)):
             body = json.dumps(body)
         # generate robot's auth token
         if auth_token == "":
@@ -229,7 +230,7 @@ class MixinBotApi:
         r = r.json()
         if 'error' in r:
             raise Exception(r['error'])
-        # print(result_obj)
+        print(r)
         return r['data']
 
     """
@@ -339,31 +340,48 @@ class MixinBotApi:
         """
         return await self.get(f'/conversations/{conversation_id}', auth_token)
 
+    async def send_messages(self, messages):
+        '''
+        [
+            {
+                "conversation_id": "UUID",
+                "recipient_id": "UUID",
+                "message_id": "UUID",
+                "category": "",
+                "representative_id": "UUID",
+                "quote_message_id": "UUID",
+                "data": "Base64 encoded data"
+            }
+        ]
+        '''
+        return await self.post('/messages', messages)
+
     async def send_message(self, conversation_id: str, category: str, data: str):
         if isinstance(data, str):
             data = data.encode()
-        params = {
+        msg = {
             "conversation_id": conversation_id,
-            "category": category,
-            "status": "SENT",
+            # "recipient_id": self.client_id,
             "message_id": str(uuid.uuid4()),
-            "data": base64.b64encode(data).decode().strip('=')
+            "category": category,
+            # "representative_id": "UUID",
+            # "quote_message_id": "UUID",
+            "data": base64.urlsafe_b64encode(data).decode()
         }
-        return await self.post('/messages', params)
+        return await self.post('/messages', msg)
 
     async def send_text_message(self, conversation_id: str, data: Union[str, bytes]):
         return await self.send_message(conversation_id, "PLAIN_TEXT", data)
 
-    async def send_sticker_message(self, conversation_id: str, sticker_id: str):
+    async def send_sticker_message(self, conversation_id: str, name: str, album_id: str, sticker_id: str):
+        '''
+        data example:
+            {"name":"jiayou","album_id":"fb0eea56-c09f-4372-8ff4-9799f15b0f03","sticker_id":"0083ea85-7d28-4d0e-8132-427b6c3c9507"}
+        '''
         data = {
+            "name": name,
+            "album_id": album_id,
             "sticker_id": sticker_id
-        }
-        data = json.dumps(data)
-        return await self.send_message(conversation_id, "PLAIN_STICKER", data)
-
-    async def send_contract_message(self, conversation_id: str, user_id: str):
-        data = {
-            "user_id": user_id
         }
         data = json.dumps(data)
         return await self.send_message(conversation_id, "PLAIN_STICKER", data)
@@ -377,11 +395,24 @@ class MixinBotApi:
 
     async def send_button_group_message(self, conversation_id: str, label: str, color: str, action: str):
         data = {
+            "label": label,
             "action": action,
-            "color": color,
-            "label": label
+            "color": color
         }
-        data = json.dumps(data)
+        data = json.dumps([data])
+        return await self.send_message(conversation_id, "APP_BUTTON_GROUP", data)
+
+    @staticmethod
+    def _convert_object_to_dict(x):
+        if isinstance(x, Button):
+            return x.__dict__()
+        return x
+
+    async def send_button_group_messages(self, conversation_id: str, buttons: List[Union[dict, Button]]):
+        assert len(buttons) > 0
+        if isinstance(buttons[0], Button):
+            buttons = [self._convert_object_to_dict(x) for x in buttons]
+        data = json.dumps(buttons)
         return await self.send_message(conversation_id, "APP_BUTTON_GROUP", data)
 
     """

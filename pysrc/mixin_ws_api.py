@@ -26,6 +26,9 @@ class MixinWSApi:
         self.on_message = on_message
 
     async def connect(self):
+        if self.ws:
+            return
+
         encoded = self.bot.gen_get_jwt_token('/', "", str(uuid.uuid4()))
 
         uri = "wss://blaze.mixin.one"
@@ -49,43 +52,14 @@ class MixinWSApi:
 
         await self.ws.send(fgz.getvalue())
         while True:
+            if not self.ws:
+                return
             msg = await self.ws.recv()
             msg = BytesIO(msg)
             msg = gzip.GzipFile(mode="rb", fileobj=msg)
             msg = msg.read()
             msg = json.loads(msg)
-            # logger.info(msg)
             await self.on_message(msg)
-
-        await self.ws.close()
-
-
-    """
-    ========================
-    WEBSOCKET DEFAULT METHOD
-    ========================
-    """
-
-    """
-    on_open default
-    """
-
-    def __on_open(ws):
-
-        def run(*args):
-            print("ws open")
-            Message = {"id": str(uuid.uuid1()), "action": "LIST_PENDING_MESSAGES"}
-            Message_instring = json.dumps(Message)
-
-            fgz = BytesIO()
-            gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
-            gzip_obj.write(Message_instring.encode())
-            gzip_obj.close()
-            ws.send(fgz.getvalue(), opcode=websocket.ABNF.OPCODE_BINARY)
-            # while True:
-            #     time.sleep(1)
-        run()
-        # thread.start_new_thread(run, ())
 
     """
     =================
