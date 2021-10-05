@@ -7,6 +7,8 @@ add_library(_mixin MODULE
 
 python_extension_module(_mixin)
 
+add_dependencies(_mixin build_mixin)
+
 target_link_libraries(_mixin ${CMAKE_CURRENT_SOURCE_DIR}/mixin/libmixin.a)
 
 target_include_directories(_mixin PRIVATE 

@@ -28,11 +28,11 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.17'
-      - uses: seanmiddleditch/gha-setup-ninja@master
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.9
         with:
           cmake-version: '3.16.x'
+      - uses: seanmiddleditch/gha-setup-ninja@master
       - name: Checkout
         uses: actions/checkout@v2
         with:
