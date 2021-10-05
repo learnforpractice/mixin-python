@@ -1,19 +1,17 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Mixin Python
+name: Build mixin-python
 
 on:
   push:
     branches:
-      - master
-      - main
+      - "*"
     tags:
       - "v*.*.*"
   pull_request:
     branches:
-      - master
-      - main
+      - "main"
 jobs:
   run:
     runs-on: ${{ matrix.os }}
@@ -32,7 +30,7 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v1.9
         with:
           cmake-version: '3.16.x'
-      - uses: seanmiddleditch/gha-setup-ninja@master
+      # - uses: seanmiddleditch/gha-setup-ninja@master
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -51,6 +49,10 @@ jobs:
       #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
       #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
       #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Build libmixin.a
+        working-directory: src/mixin
+        run: |
+          go build -o libmixin.a -buildmode=c-archive
       - name: Build mixin-python
         run: |
           python setup.py sdist bdist_wheel
