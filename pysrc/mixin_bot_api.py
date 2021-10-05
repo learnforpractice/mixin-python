@@ -28,7 +28,7 @@ from urllib.parse import urlencode
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 
-from .message_types import Button
+from .message_types import ButtonMessage
 
 import httpx
 
@@ -230,7 +230,6 @@ class MixinBotApi:
         r = r.json()
         if 'error' in r:
             raise Exception(r['error'])
-        print(r)
         return r['data']
 
     """
@@ -404,13 +403,13 @@ class MixinBotApi:
 
     @staticmethod
     def _convert_object_to_dict(x):
-        if isinstance(x, Button):
+        if isinstance(x, ButtonMessage):
             return x.__dict__()
         return x
 
-    async def send_button_group_messages(self, conversation_id: str, buttons: List[Union[dict, Button]]):
+    async def send_button_group_messages(self, conversation_id: str, buttons: List[Union[dict, ButtonMessage]]):
         assert len(buttons) > 0
-        if isinstance(buttons[0], Button):
+        if isinstance(buttons[0], ButtonMessage):
             buttons = [self._convert_object_to_dict(x) for x in buttons]
         data = json.dumps(buttons)
         return await self.send_message(conversation_id, "APP_BUTTON_GROUP", data)

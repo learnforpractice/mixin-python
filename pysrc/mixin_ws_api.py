@@ -40,26 +40,33 @@ class MixinWSApi:
     run websocket server forever
     """
     async def run(self):
-        await self.connect()
-
-        Message = {"id": str(uuid.uuid1()), "action": "LIST_PENDING_MESSAGES"}
-        Message_instring = json.dumps(Message)
-
-        fgz = BytesIO()
-        gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
-        gzip_obj.write(Message_instring.encode())
-        gzip_obj.close()
-
-        await self.ws.send(fgz.getvalue())
         while True:
-            if not self.ws:
-                return
-            msg = await self.ws.recv()
-            msg = BytesIO(msg)
-            msg = gzip.GzipFile(mode="rb", fileobj=msg)
-            msg = msg.read()
-            msg = json.loads(msg)
-            await self.on_message(msg)
+            await self.connect()
+
+            Message = {"id": str(uuid.uuid1()), "action": "LIST_PENDING_MESSAGES"}
+            Message_instring = json.dumps(Message)
+
+            fgz = BytesIO()
+            gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
+            gzip_obj.write(Message_instring.encode())
+            gzip_obj.close()
+
+            await self.ws.send(fgz.getvalue())
+            while True:
+                if not self.ws:
+                    return
+                try:
+                    msg = await self.ws.recv()
+                except websockets.exceptions.ConnectionClosedError:
+                    self.ws = None
+                    break
+                except websockets.exceptions.ConnectionClosedOK:
+                    return
+                msg = BytesIO(msg)
+                msg = gzip.GzipFile(mode="rb", fileobj=msg)
+                msg = msg.read()
+                msg = json.loads(msg)
+                await self.on_message(msg)
 
     """
     =================
