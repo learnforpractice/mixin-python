@@ -13,6 +13,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == '__main__':
+    sys.argv[0] = 'mixin'
     args = json.dumps(sys.argv)
     def start():
         _mixin.main(args)
