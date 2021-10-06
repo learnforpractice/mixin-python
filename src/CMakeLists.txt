@@ -5,6 +5,10 @@ add_library(_mixin MODULE
     ${_mixin}
 )
 
+if (WIN32)
+    add_compile_definitions(MS_WIN64)
+endif()
+
 python_extension_module(_mixin)
 
 add_dependencies(_mixin build_mixin)
