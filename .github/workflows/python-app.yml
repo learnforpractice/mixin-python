@@ -17,10 +17,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # python-version: [3.7, 3.8, 3.9]
-        # os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-        python-version: [3.9]
-        os: ['windows-latest']
+        python-version: [3.7, 3.8, 3.9]
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        # python-version: [3.9]
+        # os: ['windows-latest']
       fail-fast: false
 
     steps:
@@ -66,8 +66,9 @@ jobs:
         run: |
           python -m pip uninstall mixin-python -y;python -m pip install ./dist/${{ steps.whlfile.outputs.value }}
       - name: Test
+        working-directory: tests
         run: |
-          python3 -m mixin.main
+          python3 -m pytest -s -x test_testnet.py -k test_hello
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
