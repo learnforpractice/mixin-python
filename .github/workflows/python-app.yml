@@ -66,6 +66,7 @@ jobs:
         run: |
           python -m pip uninstall mixin-python -y;python -m pip install ./dist/${{ steps.whlfile.outputs.value }}
       - name: Test
+        if: ${{ matrix.os != 'windows-latest' }}
         working-directory: tests
         run: |
           python3 -m pytest -s -x test_testnet.py -k test_hello
