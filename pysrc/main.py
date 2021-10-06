@@ -12,7 +12,7 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-if __name__ == '__main__':
+def main():
     sys.argv[0] = 'mixin'
     args = json.dumps(sys.argv)
     def start():
@@ -20,3 +20,6 @@ if __name__ == '__main__':
     t = threading.Thread(target=start, daemon=True)
     t.start()
     t.join()
+
+if __name__ == '__main__':
+    main()
