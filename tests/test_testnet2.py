@@ -113,10 +113,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -258,10 +258,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -380,10 +380,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -580,10 +580,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -690,10 +690,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -805,10 +805,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -960,10 +960,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
@@ -1128,10 +1128,10 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/nodes.json', 'r') as f:
-            nodes = f.read()
-            nodes = json.loads(nodes)
-            domain_node = nodes[0]
+        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+            genesis = f.read()
+            genesis = json.loads(genesis)
+            domain_node = genesis['domains'][0]
         logger.info(domain_node)
         domain_address = domain_node['signer']
         decoded_addr = self.api.decode_address(domain_address)
