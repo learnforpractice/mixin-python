@@ -69,6 +69,7 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
         working-directory: tests
         run: |
+          python -m pip install -r ../requirements-dev.txt
           python3 -m pytest -s -x test_testnet.py -k test_hello
       - name: Release
         uses: softprops/action-gh-release@v1
