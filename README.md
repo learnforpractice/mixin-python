@@ -12,8 +12,9 @@
 </h3>
 
 # Install mixin-python
+
 ```bash
-python -m pip install pymixin
+pip install mixin-python
 ```
 
 # Quick Start

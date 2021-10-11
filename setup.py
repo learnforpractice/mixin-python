@@ -19,7 +19,7 @@ version = platform.python_version_tuple()
 version = '%s.%s' % (version[0], version[1])
 
 setup(
-    name="pymixin",
+    name="mixin-python",
     version="0.2.1",
     description="Mixin Binding Project",
     author='learnforpractice',
