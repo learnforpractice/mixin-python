@@ -11,75 +11,9 @@
   </a>
 </h3>
 
-# [Releases](https://github.com/learnforpractice/mixin-python/releases/tag/v0.1)
-
-# [Docs](https://learnforpractice.github.io/mixin-python/)
-
-# Install Build Dependencies
-
-clang & go 1.16 & cmake
-
-Ubuntu
-```
-sudo apt install python3-dev
-sudo apt install python3-pip
-sudo apt install clang
-sudo apt install cmake
-```
-
-[Intall golang](https://golang.org/doc/install)
-
-
-# Building
-
-### Download Source Code
-
-```
-git clone https://github.com/learnforpractice/mixin-python --recursive
-cd mixin-python
-python3 -m pip install -r requirements-dev.txt 
-```
-
-### Update mixin-python Source Code
-
+# Install mixin-python
 ```bash
-git pull
-git submodule update --init --recursive
-```
-
-### Build on Linux
-
-```
-./build-linux.sh
-```
-
-### Build on macOS X
-
-```
-./build-mac.sh
-```
-
-# Installation
-
-```bash
-python3 -m pip install dist/mixin-0.1.0-*
-```
-
-## Install from Prebuild Package
-
-Ubuntu python3.7
-```bash
-python3.7 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp37-cp37m-linux_x86_64.whl
-```
-
-Ubuntu python3.8
-```bash
-python3.8 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp38-cp38-linux_x86_64.whl
-```
-
-macOS X
-```bash
-python3.7 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp37-cp37m-macosx_10_9_x86_64.whl
+python -m pip install pymixin
 ```
 
 # Quick Start
@@ -129,6 +63,54 @@ async def get_info():
   print(info)
 
 asyncio.run(get_info())
+```
+
+# [Releases](https://github.com/learnforpractice/mixin-python/releases)
+
+# [Docs](https://learnforpractice.github.io/mixin-python/)
+
+# Install Build Dependencies
+
+clang & go 1.16 & cmake
+
+Ubuntu
+```
+sudo apt install python3-dev
+sudo apt install python3-pip
+sudo apt install clang
+sudo apt install cmake
+```
+
+[Intall golang](https://golang.org/doc/install)
+
+
+# Building
+
+### Download Source Code
+
+```
+git clone https://github.com/learnforpractice/mixin-python --recursive
+cd mixin-python
+python3 -m pip install -r requirements-dev.txt 
+```
+
+### Update mixin-python Source Code
+
+```bash
+git pull
+git submodule update --init --recursive
+```
+
+### Build on Linux
+
+```
+./build-linux.sh
+```
+
+### Build on macOS X
+
+```
+./build-mac.sh
 ```
 
 # Run Tests in Jupyter Notebook
