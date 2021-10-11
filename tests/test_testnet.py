@@ -8,9 +8,9 @@ import asyncio
 import subprocess
 import httpx
 
-from mixin.mixin_api import MixinApi
-from mixin import log
-from mixin.testnet import MixinTestnet
+from pymixin.mixin_api import MixinApi
+from pymixin import log
+from pymixin.testnet import MixinTestnet
 
 logger = log.get_logger(__name__)
 

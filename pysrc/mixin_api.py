@@ -58,7 +58,7 @@ class MixinApi(object):
     def decode_address(self, addr):
         '''
         Example:
-        from mixin.mixin_api import MixinApi
+        from pymixin.mixin_api import MixinApi
         api = MixinApi('http://mixin-node0.exinpool.com:8239')
         address = api.create_address()
         addr = address['address']

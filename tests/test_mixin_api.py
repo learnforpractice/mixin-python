@@ -5,9 +5,9 @@ import pytest
 import uuid
 import httpx
 
-from mixin.mixin_api import MixinApi
-from mixin import mixin_config
-from mixin import log
+from pymixin.mixin_api import MixinApi
+from pymixin import mixin_config
+from pymixin import log
 
 logger = log.get_logger(__name__)
 

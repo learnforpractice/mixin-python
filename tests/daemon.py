@@ -1,12 +1,12 @@
 import time
 import shlex
 import subprocess
-from mixin import log
+from pymixin import log
 
 logger = log.get_logger(__name__)
 logger.addHandler(log.handler)
 
-cmd = 'python3.7 -m mixin.main kernel -dir ../mixin/config'
+cmd = 'python3.7 -m pymixin.main kernel -dir ../mixin/config'
 #cmd = 'ls -l'
 
 log = open(f'mixin.log', 'a')

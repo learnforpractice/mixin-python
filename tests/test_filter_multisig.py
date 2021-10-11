@@ -14,10 +14,10 @@ import subprocess
 
 import httpx
 
-from mixin.mixin_api import MixinApi
-from mixin.mixin_bot_api import MixinBotApi
-from mixin import log
-from mixin.testnet import MixinTestnet
+from pymixin.mixin_api import MixinApi
+from pymixin.mixin_bot_api import MixinBotApi
+from pymixin import log
+from pymixin.testnet import MixinTestnet
 
 logger = log.get_logger(__name__)
 
@@ -35,7 +35,7 @@ class TestFilterMultisig(object):
                     shutil.rmtree(config_dir)
 
         if not os.path.exists('/tmp/mixin-7001'):
-            cmd = f'python3 -m mixin.main setuptestnet'
+            cmd = f'python3 -m pymixin.main setuptestnet'
             args = shlex.split(cmd)
             p = subprocess.Popen(args, stdout=subprocess.PIPE)
             p.wait()
@@ -43,8 +43,8 @@ class TestFilterMultisig(object):
 
         for i in range(7):
             port = 7001+i
-            # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
-            cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            # cmd = f'python3 -m pymixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            cmd = f'python3 -m pymixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
             # cmd = f'/Users/newworld/dev/mixin/mixin/mixin kernel -dir /tmp/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)

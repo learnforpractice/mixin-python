@@ -19,15 +19,15 @@ version = platform.python_version_tuple()
 version = '%s.%s' % (version[0], version[1])
 
 setup(
-    name="mixin",
-    version="0.2.0",
+    name="pymixin",
+    version="0.2.1",
     description="Mixin Binding Project",
     author='learnforpractice',
     url="https://github.com/learnforpractice/mixin-python",
     license="GPL-3.0",
-    packages=['mixin'],
-    package_dir={'mixin': 'pysrc'},
-    package_data={'mixin': []},
+    packages=['pymixin'],
+    package_dir={'pymixin': 'pysrc'},
+    package_data={'pymixin': []},
     data_files = data_files,
     scripts=[],
     install_requires=[

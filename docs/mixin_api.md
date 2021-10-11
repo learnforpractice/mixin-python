@@ -3,7 +3,7 @@
 ## create_address
 
 ```python
-from mixin.mixin_api import MixinApi
+from pymixin.mixin_api import MixinApi
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
 addr = api.create_address()
 print(addr)
@@ -16,7 +16,7 @@ async def get_info(self)
 ```
 
 ```python
-from mixin.mixin_api import MixinApi
+from pymixin.mixin_api import MixinApi
 
 api = MixinApi('http://mixin-node0.exinpool.com:8239')
 
@@ -33,8 +33,8 @@ def sign_transaction(self, trx, accounts, input_indexes=[0], seed='')
 Example
 
 ```python
-from mixin.testnet import MixinTestnet
-from mixin.mixin_api import MixinApi
+from pymixin.testnet import MixinTestnet
+from pymixin.mixin_api import MixinApi
 
 api = MixinApi('http://127.0.0.1:8001')
 
@@ -82,8 +82,8 @@ async def send_raw_transaction(self, raw)
 Example
 
 ```python
-from mixin.testnet import MixinTestnet
-from mixin.mixin_api import MixinApi
+from pymixin.testnet import MixinTestnet
+from pymixin.mixin_api import MixinApi
 
 api = MixinApi('http://127.0.0.1:8001')
 
@@ -132,8 +132,8 @@ async def send_transaction(self, trx, accounts, seed='')
 ```
 
 ```python
-from mixin.testnet import MixinTestnet
-from mixin.mixin_api import MixinApi
+from pymixin.testnet import MixinTestnet
+from pymixin.mixin_api import MixinApi
 
 api = MixinApi('http://127.0.0.1:8001')
 
