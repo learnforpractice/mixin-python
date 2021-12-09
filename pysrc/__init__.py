@@ -1,6 +1,6 @@
 from . import mixin_api
 from . import mixin_bot_api
-__VERSION__ = '0.2.0'
+__VERSION__ = '0.2.2'
 
 default_api = mixin_api.MixinApi()
 
