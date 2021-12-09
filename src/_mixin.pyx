@@ -11,6 +11,7 @@ from libc.stdlib cimport malloc, free
 
 cdef extern from * :
     ctypedef long long int64_t
+    ctypedef unsigned long long uint64_t
 
 cdef extern from "<Python.h>":
     ctypedef long long PyLongObject
@@ -49,7 +50,7 @@ cdef extern from "libmixin.h" nogil:
     char* GetFeeAssetId(char* asset);
     bool BatchVerify(char* msg, int msg_size, char** keys, int keys_size, char** sigs, int sigs_size);
     char* NewGhostKeys(char* seed, char* accounts, int outputs);
-
+    char* EncryptEd25519PIN(char* pin, char* pinTokenBase64, char* sessionId, char* privateKey, uint64_t interator)
 
 cdef object convert(char *_ret):
     ret = <object>_ret
@@ -193,3 +194,5 @@ def batch_verify(msg, keys, sigs):
 def new_ghost_keys(char *seed, char* accounts, int outputs):
     return NewGhostKeys(seed, accounts, outputs)
 
+def encrypt_ed25519_pin(char *pin, char *pinTokenBase64, char *sessionId, char *privateKey, uint64_t interator):
+    return EncryptEd25519PIN(pin, pinTokenBase64, sessionId, privateKey, interator)

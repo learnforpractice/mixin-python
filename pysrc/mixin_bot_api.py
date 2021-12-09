@@ -29,6 +29,7 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 
 from .message_types import ButtonMessage
+from . import mixin_api
 
 import httpx
 
@@ -42,6 +43,7 @@ class MixinBotApi:
         self.pay_pin = mixin_config['pin']
         self.pin_token = mixin_config['pin_token']
         self.private_key = mixin_config['private_key']
+        self.private_key_base64 = self.private_key
 
         if self.private_key.find('RSA PRIVATE KEY') >= 0:
             self.algorithm='RS512'
@@ -103,15 +105,14 @@ class MixinBotApi:
         return encoded
 
     def gen_encrypted_pin(self, iterString = None):
+        if self.algorithm == 'EdDSA':
+            return mixin_api.encrypt_ed25519_pin(self.pay_pin, self.pin_token, self.pay_session_id, self.private_key_base64, int(time.time()*1e9))
+
         if self.keyForAES == "":
             privKeyObj = RSA.importKey(self.private_key)
-
             decoded_result = base64.b64decode(self.pin_token)
-
             cipher = PKCS1_OAEP.new(key=privKeyObj, hashAlgo=Crypto.Hash.SHA256, label=self.pay_session_id.encode("utf-8"))
-
             decrypted_msg = cipher.decrypt(decoded_result)
-
             self.keyForAES = decrypted_msg
 
         tsstring = int(time.time()) # unix time

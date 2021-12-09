@@ -17,6 +17,13 @@ def check_result(ret):
         raise Exception(ret['error'])
     return json.loads(ret['data'])
 
+def encrypt_ed25519_pin(pin, pinTokenBase64, sessionId, privateKey, interator):
+    ret = _mixin.encrypt_ed25519_pin(pin, pinTokenBase64, sessionId, privateKey, interator)
+    ret = json.loads(ret)
+    if 'error' in ret:
+        raise Exception(ret['error'])
+    return ret['data']
+
 class MixinApi(object):
 
     def __init__(self, url='http://127.0.0.1:8001'):
