@@ -20,7 +20,7 @@ version = '%s.%s' % (version[0], version[1])
 
 setup(
     name="mixin-python",
-    version="0.2.1",
+    version="0.2.2",
     description="Mixin Binding Project",
     author='learnforpractice',
     url="https://github.com/learnforpractice/mixin-python",
