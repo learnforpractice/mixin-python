@@ -61,7 +61,7 @@ class MixinBotApi:
     def decode_ed25519(cls, priv):
         if not len(priv) % 4 == 0:
             priv = priv + '===='
-        priv = base64.b64decode(priv, altchars=b'-_')
+        priv = base64.urlsafe_b64decode(priv)
         return ed25519.Ed25519PrivateKey.from_private_bytes(priv[:32])
 
     def generate_sig(self, method, uri, body):
@@ -517,19 +517,38 @@ class MixinBotApi:
         """
         return await self.__genNetworkGetRequest('/addresses/' + address_id)
 
-    async def transfer_to(self, to_user_id, to_asset_id, to_asset_amount, memo, trace_uuid=""):
-        """
-        Transfer of assets between Mixin Network users.
-        """
-        # generate encrypted pin
+    async def transfer_to(self, user_id, asset_id, amount, memo, trace_id=None):
         encrypted_pin = self.gen_encrypted_pin()
+        if not trace_id:
+            trace_id = str(uuid.uuid1())
+        if isinstance(user_id, str):
+            body = {
+                'asset_id': asset_id,
+                'counter_user_id': user_id,
+                'amount': str(amount),
+                'pin': encrypted_pin,
+                'trace_id': trace_id,
+                'memo': memo
+            }
+            return await self.__genNetworkPostRequest('/transfers', body)
 
-        body = {'asset_id': to_asset_id, 'counter_user_id': to_user_id, 'amount': str(to_asset_amount),
-                'pin': encrypted_pin, 'trace_id': trace_uuid, 'memo': memo}
-        if trace_uuid == "":
-            body['trace_id'] = str(uuid.uuid1())
+    async def transfer_to_users(self, user_ids, threshold, asset_id, amount, memo, trace_id=None):
+        encrypted_pin = self.gen_encrypted_pin()
+        if not trace_id:
+            trace_id = str(uuid.uuid1())
 
-        return await self.__genNetworkPostRequest('/transfers', body)
+        body = {
+            "asset_id": asset_id,
+            "amount": str(amount),
+            "trace_id": trace_id,
+            "memo": memo,
+            "opponent_multisig": {
+                "receivers" : user_ids,
+                "threshold": threshold
+            },
+            "pin": encrypted_pin
+        }
+        return await self.__genNetworkPostRequest('/transactions', body)
 
     async def get_transfer(self, trace_id):
         """
