@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import subprocess
 
 version = sys.argv[1]
@@ -23,5 +24,13 @@ files = [
 url = f'https://github.com/learnforpractice/mixin-python/releases/download/v{version}/'
 
 for f in files:
-    if not os.path.exists(f):
+    count = 60*60/10
+    while True:
+        print('Downloading {}'.format(f))
         subprocess.call(['wget', url + f])
+        if os.path.exists(f):
+            break
+        time.sleep(10)
+        count -= 1
+        if count <= 0:
+            break
