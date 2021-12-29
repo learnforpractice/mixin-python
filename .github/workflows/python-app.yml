@@ -15,6 +15,8 @@ on:
 jobs:
   run:
     runs-on: ${{ matrix.os }}
+    env:
+      VERSION: 0.2.3
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10"]
@@ -91,3 +93,16 @@ jobs:
         with:
           files: |
             ./dist/wheelhouse/${{ steps.manylinuxwhlfile.outputs.value }}
+      - name: Downloading whl files
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-18.04' && matrix.python-version == '3.10' }}
+        working-directory: dist
+        run: |
+          rm *.whl
+          rm -r wheelhouse
+          python ../scripts/download.py ${{ env.VERSION }}
+      - name: Publish a Python distribution to PyPI
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-18.04' && matrix.python-version == '3.10' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
