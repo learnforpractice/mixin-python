@@ -479,7 +479,7 @@ class MixinBotApi:
         body = {
             "address_id": address_id,
             "pin": encrypted_pin,
-            "amount": amount,
+            "amount": f'{amount:.8f}',
             "trace_id": trace_id,
             "memo": memo
 
@@ -525,7 +525,7 @@ class MixinBotApi:
             body = {
                 'asset_id': asset_id,
                 'counter_user_id': user_id,
-                'amount': str(amount),
+                'amount': f'{amount:.8f}',
                 'pin': encrypted_pin,
                 'trace_id': trace_id,
                 'memo': memo
@@ -539,7 +539,7 @@ class MixinBotApi:
 
         body = {
             "asset_id": asset_id,
-            "amount": str(amount),
+            "amount": f'{amount:.8f}',
             "trace_id": trace_id,
             "memo": memo,
             "opponent_multisig": {
@@ -563,7 +563,7 @@ class MixinBotApi:
         body = {
             "asset_id": asset_id,
             "opponent_id": opponent_id,
-            "amount": amount,
+            "amount": f'{amount:.8f}',
             "trace_id": trace_id
         }
 
