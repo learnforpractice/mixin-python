@@ -58,6 +58,9 @@ class MixinBotApi:
         self.api_base_url = 'https://api.mixin.one'
         #self.api_base_url = 'https://mixin-api.zeromesh.net'
 
+    async def close(self):
+        await self.client.aclose()
+
     def decode_ed25519(cls, priv):
         if not len(priv) % 4 == 0:
             priv = priv + '===='
@@ -517,7 +520,7 @@ class MixinBotApi:
         """
         return await self.__genNetworkGetRequest('/addresses/' + address_id)
 
-    async def transfer_to(self, user_id, asset_id, amount, memo, trace_id=None):
+    async def transfer_to_user(self, user_id, asset_id, amount, memo, trace_id=None):
         encrypted_pin = self.gen_encrypted_pin()
         if not trace_id:
             trace_id = str(uuid.uuid1())
