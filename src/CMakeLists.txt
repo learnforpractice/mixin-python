@@ -7,29 +7,35 @@ add_library(_mixin MODULE
 
 if (WIN32)
     add_compile_definitions(MS_WIN64)
+    SET(BUILD_TARGET mixin.lib)
+    SET(BUILD_LIB_CMD go build -o ${CMAKE_CURRENT_SOURCE_DIR}/pyeoskit/mixin.dll -buildmode=c-shared && gendef mixin.dll && lib /def:pyeoskit.def /machine:x64 /out:mixin.lib && cmake -E copy libmixin.bk.h libmixin.h)
+else()
+    SET(BUILD_TARGET libmixin.a)
+    SET(BUILD_LIB_CMD go build -o ${BUILD_TARGET} -buildmode=c-archive)
 endif()
 
 python_extension_module(_mixin)
 
 add_dependencies(_mixin build_mixin)
 
-target_link_libraries(_mixin ${CMAKE_CURRENT_SOURCE_DIR}/mixin/libmixin.a)
+target_link_libraries(_mixin ${CMAKE_CURRENT_SOURCE_DIR}/mixin/${BUILD_TARGET})
 
 target_include_directories(_mixin PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/mixin
 )
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/mixin/libmixin.a
-    COMMAND go build -o libmixin.a -buildmode=c-archive
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/${BUILD_TARGET})
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/mixin/${BUILD_TARGET}
+    COMMAND ${BUILD_LIB_CMD}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/mixin_api.go
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/main.go
-    COMMENT "Creating libmixin.a"
+    COMMENT "Creating ${BUILD_TARGET}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/mixin
 )
 
 add_custom_target(build_mixin ALL
-    COMMAND echo "Building libmixin.a"
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/libmixin.a
+    COMMAND echo "Building ${BUILD_TARGET}"
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mixin/${BUILD_TARGET}
     # to make quotes printable,for example
     VERBATIM
 )

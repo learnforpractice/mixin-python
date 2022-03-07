@@ -20,12 +20,19 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10"]
-        os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
         # python-version: [3.9]
         # os: ['windows-latest']
       fail-fast: false
 
     steps:
+      - uses: MinoruSekine/setup-scoop@v1
+        if: ${{ matrix.os == 'windows-2019' }} 
+      - name: Install Dependencies
+        if: ${{ matrix.os == 'windows-2019' }} 
+        shell: bash
+        run: |
+          scoop install ninja gcc
       - name: Install Go
         uses: actions/setup-go@v2
         with:
