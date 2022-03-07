@@ -8,7 +8,7 @@ add_library(_mixin MODULE
 if (WIN32)
     add_compile_definitions(MS_WIN64)
     SET(BUILD_TARGET mixin.lib)
-    SET(BUILD_LIB_CMD go build -o ${CMAKE_CURRENT_SOURCE_DIR}/pyeoskit/mixin.dll -buildmode=c-shared && gendef mixin.dll && lib /def:pyeoskit.def /machine:x64 /out:mixin.lib && cmake -E copy libmixin.bk.h libmixin.h)
+    SET(BUILD_LIB_CMD go build -o mixin.dll -buildmode=c-shared && gendef mixin.dll && lib /def:mixin.def /machine:x64 /out:mixin.lib && cmake -E copy libmixin.bk.h libmixin.h)
 else()
     SET(BUILD_TARGET libmixin.a)
     SET(BUILD_LIB_CMD go build -o ${BUILD_TARGET} -buildmode=c-archive)
