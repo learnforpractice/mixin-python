@@ -26,12 +26,10 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: MinoruSekine/setup-scoop@v1
+      - name: Install scoop
         if: ${{ matrix.os == 'windows-2019' }} 
-      - name: Install Dependencies
-        if: ${{ matrix.os == 'windows-2019' }} 
-        shell: bash
         run: |
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
           scoop install ninja gcc
       - name: Install Go
         uses: actions/setup-go@v2
