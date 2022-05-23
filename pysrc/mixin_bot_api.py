@@ -17,16 +17,9 @@ import uuid
 import json
 
 import jwt
-import Crypto
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Signature import PKCS1_v1_5
-from Crypto import Random
-from Crypto.Cipher import AES
 from urllib.parse import urlencode
 
 from cryptography.hazmat.primitives.asymmetric import ed25519
-from cryptography.hazmat.primitives import serialization
 
 from .message_types import ButtonMessage
 from . import mixin_api
@@ -46,6 +39,7 @@ class MixinBotApi:
         self.private_key_base64 = self.private_key
 
         if self.private_key.find('RSA PRIVATE KEY') >= 0:
+            raise Exception("RSA private key supports has been deprecated, use ed25519 instead!")
             self.algorithm='RS512'
         else:
             self.algorithm = 'EdDSA'
@@ -53,7 +47,6 @@ class MixinBotApi:
 
         self.client = httpx.AsyncClient()
 
-        self.keyForAES = ""
         # mixin api base url
         self.api_base_url = 'https://api.mixin.one'
         #self.api_base_url = 'https://mixin-api.zeromesh.net'
@@ -89,17 +82,6 @@ class MixinBotApi:
 
         return encoded
 
-    def gen_get_listen_signed_token(self, uristring, bodystring, jti):
-        jwtSig = self.gen_get_sig(uristring, bodystring)
-        iat = datetime.datetime.utcnow()
-        exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
-        privKeyObj = RSA.importKey(self.private_key)
-        signer = PKCS1_v1_5.new(privKeyObj)
-        signature = signer.sign(encoded)
-        return signature
-
-
     def gen_post_jwt_token(self, uristring, bodystring, jti):
         jwtSig = self.genPOSTSig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
@@ -108,38 +90,8 @@ class MixinBotApi:
         return encoded
 
     def gen_encrypted_pin(self, iterString = None):
-        if self.algorithm == 'EdDSA':
-            return mixin_api.encrypt_ed25519_pin(self.pay_pin, self.pin_token, self.pay_session_id, self.private_key_base64, int(time.time()*1e9))
-
-        if self.keyForAES == "":
-            privKeyObj = RSA.importKey(self.private_key)
-            decoded_result = base64.b64decode(self.pin_token)
-            cipher = PKCS1_OAEP.new(key=privKeyObj, hashAlgo=Crypto.Hash.SHA256, label=self.pay_session_id.encode("utf-8"))
-            decrypted_msg = cipher.decrypt(decoded_result)
-            self.keyForAES = decrypted_msg
-
-        tsstring = int(time.time()) # unix time
-        tsstring = tsstring.to_bytes(8, 'little')
-
-        if iterString is None:
-            iterator = int(time.time() * 1e9) # unix nano
-            iterator = iterator.to_bytes(8, 'little')
-            toEncryptContent = self.pay_pin.encode('utf8') + tsstring + iterator
-        else:
-            toEncryptContent = self.pay_pin.encode('utf8') + tsstring + iterString
-
-        toPadCount = AES.block_size - len(toEncryptContent) % AES.block_size
-        toEncryptContent = toEncryptContent + int.to_bytes(toPadCount, 1, 'little') * toPadCount
-
-        iv = Random.new().read(AES.block_size)
-
-        cipher = AES.new(self.keyForAES, AES.MODE_CBC,iv)
-        encrypted_result = cipher.encrypt(toEncryptContent)
-
-        msg = iv + encrypted_result
-        encrypted_pin = base64.b64encode(msg)
-
-        return encrypted_pin.decode()
+        assert self.algorithm == 'EdDSA', "mixin bot only support ed25519 crypto now!"
+        return mixin_api.encrypt_ed25519_pin(self.pay_pin, self.pin_token, self.pay_session_id, self.private_key_base64, int(time.time()*1e9))
 
     def __genUrl(self, path):
         """

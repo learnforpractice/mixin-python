@@ -1,1 +1,3 @@
-Release v0.2.3
+Release v0.2.4
+
+1. Deprecating RSA supports

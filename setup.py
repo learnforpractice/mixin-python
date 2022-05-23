@@ -24,7 +24,7 @@ version = '%s.%s' % (version[0], version[1])
 
 setup(
     name="mixin-python",
-    version="0.2.3",
+    version="0.2.4",
     description="Mixin Binding Project",
     author='learnforpractice',
     url="https://github.com/learnforpractice/mixin-python",
@@ -36,7 +36,6 @@ setup(
     scripts=[],
     install_requires=[
         "pycparser>=2.19",
-        "pycryptodome>=3.7.2",
         "PyJWT>=2.1.0",
         "python-dateutil>=2.7.5",
         "requests>=2.21.0",
