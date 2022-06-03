@@ -1,4 +1,4 @@
-VERSION=v0.2.4
+VERSION=v0.2.5
 git push origin :refs/tags/$VERSION
 git tag -d $VERSION
 git tag $VERSION -F release.txt
