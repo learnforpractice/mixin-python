@@ -19,8 +19,9 @@ cdef extern from "<Python.h>":
     object PyBytes_FromStringAndSize(const char* str, int size)
     int _PyLong_AsByteArray(PyLongObject* v, unsigned char* bytes, size_t n, int little_endian, int is_signed)
 
-cdef extern from "libmixin.h" nogil:
-    void Init();
+cdef extern from "wrapper.h" nogil:
+    ctypedef char *(*fn_malloc)(uint64_t size)
+    void Init(fn_malloc fn)
     char* GetMixinVersion()
     int MixinMain(char* args)
     char* CreateAddress(char* _params);
@@ -63,8 +64,11 @@ def main(_args):
     with nogil:
         MixinMain(args)
 
+cdef char *user_malloc(uint64_t size):
+    return <char *>malloc(size)
+
 def init():
-    Init()
+    Init(<fn_malloc>user_malloc)
 
 def get_mixin_version():
     cdef char* ret
