@@ -1,4 +1,9 @@
 # Python Bindings for [Mixin](https://github.com/mixinNetwork/mixin)
+
+[![PyPi](https://img.shields.io/pypi/v/mixin-python.svg)](https://pypi.org/project/mixin-python)
+[![PyPi](https://img.shields.io/pypi/dm/mixin-python.svg)](https://pypi.org/project/mixin-python)
+
+
 <h3>
   <a
     target="_blank"
