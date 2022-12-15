@@ -72,8 +72,9 @@ jobs:
           python setup.py sdist bdist_wheel
       - name: get whl file
         id: whlfile
+        shell: bash
         run: |
-          echo "::set-output name=value::$(python scripts/get_whl_file.py)"
+          echo "value=`python scripts/get_whl_file.py`" >> $GITHUB_OUTPUT
       - name: Install mixin-python
         run: |
           python -m pip uninstall mixin-python -y;python -m pip install ./dist/${{ steps.whlfile.outputs.value }}
@@ -90,7 +91,7 @@ jobs:
         run: |
           python -m pip install -U patchelf
           python -m auditwheel repair --plat manylinux_2_17_x86_64 ${{ steps.whlfile.outputs.value }}
-          echo "::set-output name=value::$(python ../scripts/get_whl_file.py ./wheelhouse manylinux)"
+          echo "value=`python ../scripts/get_whl_file.py ./wheelhouse manylinux`" >> $GITHUB_OUTPUT
           echo "+++manylinuxwhlfile: ${{ steps.manylinuxwhlfile.outputs.value }}"
       - name: Release
         uses: softprops/action-gh-release@v1
