@@ -36,7 +36,7 @@ setup(
     scripts=[],
     install_requires=[
         "pycparser>=2.19",
-        "PyJWT>=2.1.0",
+        "PyJWT>=2.4.0",
         "python-dateutil>=2.7.5",
         "requests>=2.21.0",
         "websockets>=9.1",
