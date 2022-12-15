@@ -8,6 +8,7 @@ import json
 import uuid
 import gzip
 import time
+from typing import Union
 from io import BytesIO
 import base64
 import websockets
@@ -137,14 +138,14 @@ class MixinWSApi:
     reply a text to user
     """
 
-    async def sendUserText(self, in_conversation_id, to_user_id, textContent):
-
-        textContent = textContent.encode('utf-8')
-        textContent = base64.b64encode(textContent).decode(encoding='utf-8')
+    async def sendUserText(self, in_conversation_id, to_user_id, text: Union[bytes, str]):
+        if isinstance(text, str):
+            text = text.encode('utf-8')
+        text = base64.b64encode(text).decode(encoding='utf-8')
 
         params = {"conversation_id": in_conversation_id, "recipient_id": to_user_id, "status": "SENT",
                   "message_id": str(uuid.uuid4()), "category": "PLAIN_TEXT",
-                  "data": textContent}
+                  "data": text}
         return await self.writeMessage("CREATE_MESSAGE", params)
 
     """
