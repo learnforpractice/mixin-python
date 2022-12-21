@@ -54,7 +54,6 @@ class TestMixinApi(object):
         logger.info('++++++')
         cls.api = MixinApi('http://127.0.0.1:8001')
 
-        loop = asyncio.get_event_loop()
         async def wait():
             api = MixinApi('http://127.0.0.1:8007')
             await asyncio.sleep(1.5)
@@ -65,7 +64,7 @@ class TestMixinApi(object):
                 except Exception as e:
                     await asyncio.sleep(0.5)
                     logger.info(e)
-        loop.run_until_complete(wait())
+        asyncio.run(wait())
         logger.info("++++setup_class return")
 
     @classmethod
@@ -82,8 +81,6 @@ class TestMixinApi(object):
 
     @pytest.mark.asyncio
     async def test_hello(self):
-        if self.auto_start_testnet:
-            logger.info(self.testnet.config_dirs)
         await asyncio.sleep(1.0)
         info = await self.api.get_info()
         # for key in info:

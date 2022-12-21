@@ -83,7 +83,9 @@ jobs:
         working-directory: tests
         run: |
           python -m pip install -r ../requirements-dev.txt
-          python3 -m pytest -s -x test_testnet.py -k test_hello
+          python3 -m pytest -s -x test_testnet2.py -k test_hello
+          python3 -m pytest -s -x test_testnet2.py -k test_deposit
+          python3 -m pytest -s -x test_mixin_api.py
       - name: auditwheel repair
         if: ${{ matrix.os == 'ubuntu-18.04' }}
         id: manylinuxwhlfile

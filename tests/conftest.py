@@ -1,5 +1,6 @@
 # content of conftest.py
 import pytest
+import asyncio
 
 def pytest_addoption(parser):
     parser.addoption("--newtestnet", action="store_true", help="Create a fresh new testnet")

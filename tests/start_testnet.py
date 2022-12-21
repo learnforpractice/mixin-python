@@ -46,5 +46,4 @@ async def start():
                 print(f'++++++++node {i+1} down')
         time.sleep(3.0)
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(start())
+asyncio.run(start())

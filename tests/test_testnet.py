@@ -25,7 +25,6 @@ class TestMixinApi(object):
 
         cls.api = MixinApi('http://127.0.0.1:8001')
 
-        loop = asyncio.get_event_loop()        
         async def wait():
             api = MixinApi('http://127.0.0.1:8007')
             await asyncio.sleep(2)
@@ -36,7 +35,7 @@ class TestMixinApi(object):
                 except Exception as e:
                     await asyncio.sleep(0.5)
                     logger.info(e)
-        loop.run_until_complete(wait())
+        asyncio.run(wait())
 
     @classmethod
     def teardown_class(cls):
