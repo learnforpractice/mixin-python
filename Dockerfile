@@ -24,4 +24,4 @@ USER ${NB_USER}
 
 ## Run an install.R script, if it exists.
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi
-RUN python3 -m pip install https://github.com/learnforpractice/mixin-python/releases/download/v0.1/mixin-0.1.0-cp37-cp37m-linux_x86_64.whl
+RUN python3 -m pip install -U mixin-python
