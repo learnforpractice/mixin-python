@@ -200,6 +200,8 @@ class TestMixinApi(object):
         r = await self.api.get_info()
 
         trx_hash = await self.send_transaction(trx, [account])
+        logger.info("+++++transfer trx_hash %s", trx_hash)
+        await self.wait_for_transaction(trx_hash)
 
         logger.info("+++++++++++++++withdraw++++++++++++++++++++")
         trx = {
@@ -904,7 +906,7 @@ class TestMixinApi(object):
                 return r['hash']
                 break
             except Exception as e:
-                logger.info(e)
+                logger.exception(e)
                 await asyncio.sleep(0.4)
             i = random.randint(1, 7)
             # logger.info(i)
