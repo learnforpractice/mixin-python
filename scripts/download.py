@@ -5,10 +5,10 @@ import subprocess
 
 version = sys.argv[1]
 files = [
-    f'mixin_python-{version}-cp37-cp37m-macosx_10_16_x86_64.whl',
-    f'mixin_python-{version}-cp38-cp38-macosx_10_16_x86_64.whl',
-    f'mixin_python-{version}-cp39-cp39-macosx_10_16_x86_64.whl',
-    f'mixin_python-{version}-cp310-cp310-macosx_10_16_x86_64.whl',
+    f'mixin_python-{version}-cp37-cp37m-macosx_10_15_x86_64.whl',
+    f'mixin_python-{version}-cp38-cp38-macosx_10_15_x86_64.whl',
+    f'mixin_python-{version}-cp39-cp39-macosx_10_15_x86_64.whl',
+    f'mixin_python-{version}-cp310-cp310-macosx_10_15_x86_64.whl',
 
     f'mixin_python-{version}-cp37-cp37m-win_amd64.whl',
     f'mixin_python-{version}-cp38-cp38-win_amd64.whl',
