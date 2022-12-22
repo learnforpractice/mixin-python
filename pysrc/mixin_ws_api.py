@@ -8,23 +8,63 @@ import json
 import uuid
 import gzip
 import time
-from typing import Union
+from typing import Union, Callable, Awaitable, Optional, Literal
 from io import BytesIO
 import base64
 import websockets
 
-from pymixin import mixin_config
-from pymixin.mixin_bot_api import MixinBotApi
-from pymixin import log
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
+
+from . import mixin_config
+from .mixin_bot_api import MixinBotApi
+from . import log
 
 logger = log.get_logger(__name__)
 
-class MixinWSApi:
+Category = Literal[
+        'PLAIN_TEXT',
+        'PLAIN_AUDIO',
+        'PLAIN_POST',
+        'PLAIN_IMAGE',
+        'PLAIN_DATA',
+        'PLAIN_STICKER',
+        'PLAIN_LIVE',
+        'PLAIN_LOCATION',
+        'PLAIN_VIDEO',
+        'PLAIN_CONTACT',
+        'APP_CARD',
+        'APP_BUTTON_GROUP',
+        'MESSAGE_RECALL',
+        'SYSTEM_CONVERSATION',
+        'SYSTEM_ACCOUNT_SNAPSHOT'
+    ]
 
-    def __init__(self, bot_config, on_message):
+MessageStatus = Literal['SENT', 'DELIVERED', 'READ']
+
+@dataclass_json
+@dataclass
+class MessageView:
+    type: str
+    representative_id: str
+    quote_message_id: str
+    conversation_id: str
+    user_id: str
+    session_id: str
+    message_id: str
+    category: Category
+    data: str
+    data_base64: str
+    status: MessageStatus
+    source: str
+    created_at: str
+    updated_at: str
+
+class MixinWSApi:
+    def __init__(self, bot_config, on_message: Callable[[str, str, Optional[MessageView]], Awaitable[None]]):
         self.bot = MixinBotApi(bot_config)
         self.ws = None
-        self.on_message = on_message
+        self._on_message = on_message
 
     async def connect(self):
         if self.ws:
@@ -67,7 +107,11 @@ class MixinWSApi:
                 msg = gzip.GzipFile(mode="rb", fileobj=msg)
                 msg = msg.read()
                 msg = json.loads(msg)
-                await self.on_message(msg)
+                try:
+                    view = MessageView.from_dict(msg['data'])
+                except KeyError:
+                    view = None
+                await self._on_message(msg['id'], msg['action'], view)
 
     """
     =================

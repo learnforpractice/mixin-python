@@ -311,7 +311,7 @@ class MixinBotApi:
         '''
         return await self.post('/messages', messages)
 
-    async def send_message(self, conversation_id: str, category: str, data: str):
+    async def send_message(self, conversation_id: str, category: str, data: Union[str, bytes]):
         if isinstance(data, str):
             data = data.encode()
         msg = {
@@ -338,15 +338,13 @@ class MixinBotApi:
             "album_id": album_id,
             "sticker_id": sticker_id
         }
-        data = json.dumps(data)
-        return await self.send_message(conversation_id, "PLAIN_STICKER", data)
+        return await self.send_message(conversation_id, "PLAIN_STICKER", json.dumps(data))
 
     async def send_contract_message(self, conversation_id: str, user_id: str):
         data = {
             "user_id": user_id
         }
-        data = json.dumps(data)
-        return await self.send_message(conversation_id, "PLAIN_CONTACT", data)
+        return await self.send_message(conversation_id, "PLAIN_CONTACT", json.dumps(data))
 
     async def send_button_group_message(self, conversation_id: str, label: str, color: str, action: str):
         data = {
@@ -354,8 +352,7 @@ class MixinBotApi:
             "action": action,
             "color": color
         }
-        data = json.dumps([data])
-        return await self.send_message(conversation_id, "APP_BUTTON_GROUP", data)
+        return await self.send_message(conversation_id, "APP_BUTTON_GROUP", json.dumps([data]))
 
     @staticmethod
     def _convert_object_to_dict(x):
