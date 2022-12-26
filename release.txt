@@ -1,4 +1,4 @@
-Release v0.2.7
+Release v0.2.8
 
 1. Improve MixinWSAPI class
 2. Add utils module
