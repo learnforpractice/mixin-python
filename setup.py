@@ -35,12 +35,10 @@ setup(
     data_files = data_files,
     scripts=[],
     install_requires=[
-        "pycparser>=2.19",
         "PyJWT>=2.4.0",
-        "python-dateutil>=2.7.5",
-        "requests>=2.21.0",
         "websockets>=9.1",
         "cryptography>=3.4.7",
+        "dataclasses-json",
         "httpx"
     ],
     tests_require=['pytest'],

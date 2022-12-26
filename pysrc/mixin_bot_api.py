@@ -181,7 +181,7 @@ class MixinBotApi:
         r = await self.client.post(url, data=body, headers=headers)
 # {'error': {'status': 202, 'code': 20118, 'description': 'Invalid PIN format.'}}
 
-        # r = requests.post(url, data=body, headers=headers)
+        # r = httpx.post(url, data=body, headers=headers)
 # {'error': {'status': 202, 'code': 401, 'description': 'Unauthorized, maybe invalid token.'}}
         r = r.json()
         if 'error' in r:

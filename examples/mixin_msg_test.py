@@ -1,5 +1,5 @@
 from flask import Flask, redirect, request
-import requests
+import httpx
 import json
 
 import mixin_config
@@ -51,7 +51,7 @@ def get_auth_token():
         "client_secret": mixin_config.client_secret,
     }
 
-    r = requests.post(get_auth_token_url, json=post_data)
+    r = httpx.post(get_auth_token_url, json=post_data)
     r_json = r.json()
     print(r_json)
 

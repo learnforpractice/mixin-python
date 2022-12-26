@@ -5,7 +5,7 @@ import asyncio
 import signal
 import shutil
 import tempfile
-import requests
+import httpx
 import shlex, subprocess
 from subprocess import Popen, PIPE
 
@@ -162,7 +162,7 @@ listener = "127.0.0.1:%s"'''%(self.node_addresses[i]['signer']['spend_key'], por
             try:
                 data = {'method': 'getinfo', 'params': []}
                 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-                r = requests.post('http://127.0.0.1:8007', json=data, headers=headers)
+                r = httpx.post('http://127.0.0.1:8007', json=data, headers=headers)
                 r = r.json()
                 break
             except Exception as e:

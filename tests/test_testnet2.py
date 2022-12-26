@@ -21,20 +21,21 @@ from pymixin.testnet import MixinTestnet
 
 logger = log.get_logger(__name__)
 
+tmp_dir = os.path.dirname(os.path.abspath(__file__)) + '/.tmp'
+
 class TestMixinApi(object):
 
     @classmethod
     def setup_class(cls):
         cls.nodes = []
         # if '--newtestnet' in sys.argv:
-        if True:
-            for i in range(7):
-                port = 7001+i
-                config_dir = f'/tmp/mixin-{port}'
-                if os.path.exists(config_dir):
-                    shutil.rmtree(config_dir)
+        for i in range(7):
+            port = 7001+i
+            config_dir = f'{tmp_dir}/mixin-{port}'
+            if os.path.exists(config_dir):
+                shutil.rmtree(config_dir)
 
-        if not os.path.exists('/tmp/mixin-7001'):
+        if not os.path.exists(f'{tmp_dir}/mixin-7001'):
             cmd = f'python3 -m pymixin.main setuptestnet'
             args = shlex.split(cmd)
             p = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -43,12 +44,12 @@ class TestMixinApi(object):
 
         for i in range(7):
             port = 7001+i
-            # cmd = f'python3 -m mixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
-            cmd = f'python3 -m pymixin.main kernel -dir /tmp/mixin-700{i+1} -port {port}'
-            # cmd = f'/Users/newworld/dev/mixin/mixin/mixin kernel -dir /tmp/mixin-700{i+1} -port {port}'
+            # cmd = f'python3 -m mixin.main kernel -dir {tmp_dir}/mixin-700{i+1} -port {port}'
+            cmd = f'python3 -m pymixin.main kernel -dir {tmp_dir}/mixin-700{i+1} -port {port}'
+            # cmd = f'/Users/newworld/dev/mixin/mixin/mixin kernel -dir {tmp_dir}/mixin-700{i+1} -port {port}'
             logger.info(cmd)
             args = shlex.split(cmd)
-            log = open(f'/tmp/mixin-700{i+1}/log.txt', 'a')
+            log = open(f'{tmp_dir}/mixin-700{i+1}/log.txt', 'a')
             p = subprocess.Popen(args, stdout=log, stderr=log)
             cls.nodes.append(p)
         logger.info('++++++')
@@ -99,7 +100,7 @@ class TestMixinApi(object):
 
     @pytest.mark.asyncio
     async def test_deposit(self):
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -110,7 +111,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -246,7 +247,7 @@ class TestMixinApi(object):
     @pytest.mark.asyncio
     async def test_transfer_with_multiple_input(self):
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -257,7 +258,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -368,7 +369,7 @@ class TestMixinApi(object):
     @pytest.mark.asyncio
     async def test_transfer_with_multiple_input_with_different_keys(self):
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -379,7 +380,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -568,7 +569,7 @@ class TestMixinApi(object):
                     pass
         # asyncio.create_task(monitor())
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -579,7 +580,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -678,7 +679,7 @@ class TestMixinApi(object):
                     pass
         # asyncio.create_task(monitor())
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -689,7 +690,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -793,7 +794,7 @@ class TestMixinApi(object):
                     pass
         # asyncio.create_task(monitor())
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -804,7 +805,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -948,7 +949,7 @@ class TestMixinApi(object):
                     pass
         asyncio.create_task(monitor())
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -959,7 +960,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
@@ -1116,7 +1117,7 @@ class TestMixinApi(object):
                     pass
         asyncio.create_task(monitor())
 
-        with open('/tmp/mixin-7001/config.toml', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/config.toml', 'r') as f:
             for line in f:
                 key = 'signer-key = '
                 start = line.find(key)
@@ -1127,7 +1128,7 @@ class TestMixinApi(object):
                     break
 
         logger.info('++++signer_key: %s', signer_key)
-        with open('/tmp/mixin-7001/genesis.json', 'r') as f:
+        with open(f'{tmp_dir}/mixin-7001/genesis.json', 'r') as f:
             genesis = f.read()
             genesis = json.loads(genesis)
             domain_node = genesis['domains'][0]
