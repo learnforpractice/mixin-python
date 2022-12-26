@@ -2,7 +2,7 @@ from . import mixin_api
 from . import mixin_bot_api
 from . import _mixin
 
-__VERSION__ = '0.2.6'
+__VERSION__ = '0.2.7'
 
 _mixin.init()
 
