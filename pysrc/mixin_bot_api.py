@@ -78,7 +78,7 @@ class MixinBotApi:
         jwtSig = self.gen_get_sig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
+        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig, "scp": "FULL"}, self.private_key, algorithm=self.algorithm)
 
         return encoded
 
