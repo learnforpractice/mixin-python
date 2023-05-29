@@ -67,9 +67,14 @@ jobs:
         working-directory: src/mixin
         run: |
           go build -o libmixin.a -buildmode=c-archive
-      - name: Build mixin-python
+      - name: Build mixin-python macosx
+        if: ${{ matrix.os == 'macos-12' }}
         run: |
-          python setup.py sdist bdist_wheel
+          python setup.py bdist_wheel --plat-name macosx-10.15-x86_64
+      - name: Build mixin-python
+        if: ${{ matrix.os != 'macos-12' }}
+        run: |
+          python setup.py bdist_wheel
       - name: get whl file
         id: whlfile
         shell: bash
