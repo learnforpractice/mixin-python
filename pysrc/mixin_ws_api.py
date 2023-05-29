@@ -11,6 +11,7 @@ import time
 from typing import Union, Callable, Awaitable, Optional, Literal
 from io import BytesIO
 import base64
+import asyncio
 import websockets
 
 from dataclasses import dataclass
@@ -65,6 +66,7 @@ class MixinWSApi:
         self.bot = MixinBotApi(bot_config)
         self.ws = None
         self._on_message = on_message
+        self._paused = False
 
     async def connect(self):
         if self.ws:
@@ -77,41 +79,70 @@ class MixinWSApi:
         headers={"Authorization": "Bearer " + encoded}
         self.ws = await websockets.connect(uri, subprotocols=["Mixin-Blaze-1"], extra_headers=headers)
 
+    @property
+    def paused(self):
+        return self._paused
+
+    @paused.setter
+    def paused(self, value):
+        self._paused = value
+
+    async def close_ws(self):
+        try:
+            await self.ws.close()
+            self.ws = None
+        except Exception as e:
+            logger.info("%s", e)
+
+    async def handle_message(self):
+        if not self.ws:
+            return
+        msg = await self.ws.recv()
+        msg = BytesIO(msg)
+        msg = gzip.GzipFile(mode="rb", fileobj=msg)
+        msg = msg.read()
+        msg = json.loads(msg)
+        try:
+            view = MessageView.from_dict(msg['data'])
+        except KeyError:
+            view = None
+        await self._on_message(msg['id'], msg['action'], view)
+
+    async def _run(self):
+        await self.connect()
+
+        Message = {"id": str(uuid.uuid1()), "action": "LIST_PENDING_MESSAGES"}
+        Message_instring = json.dumps(Message)
+
+        fgz = BytesIO()
+        gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
+        gzip_obj.write(Message_instring.encode())
+        gzip_obj.close()
+
+        await self.ws.send(fgz.getvalue())
+
+        while self.ws and not self.paused:
+            await self.handle_message()
+
     """
     run websocket server forever
     """
     async def run(self):
-        while True:
-            await self.connect()
-
-            Message = {"id": str(uuid.uuid1()), "action": "LIST_PENDING_MESSAGES"}
-            Message_instring = json.dumps(Message)
-
-            fgz = BytesIO()
-            gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
-            gzip_obj.write(Message_instring.encode())
-            gzip_obj.close()
-
-            await self.ws.send(fgz.getvalue())
-            while True:
-                if not self.ws:
-                    return
-                try:
-                    msg = await self.ws.recv()
-                except websockets.exceptions.ConnectionClosedError:
-                    self.ws = None
-                    break
-                except websockets.exceptions.ConnectionClosedOK:
-                    return
-                msg = BytesIO(msg)
-                msg = gzip.GzipFile(mode="rb", fileobj=msg)
-                msg = msg.read()
-                msg = json.loads(msg)
-                try:
-                    view = MessageView.from_dict(msg['data'])
-                except KeyError:
-                    view = None
-                await self._on_message(msg['id'], msg['action'], view)
+        while not self.paused:
+            try:
+                await self._run()
+            except websockets.exceptions.ConnectionClosedError:
+                logger.info("+++++ConnectionClosedError")
+                self.ws = None
+                await asyncio.sleep(1.0)
+                continue
+            except websockets.exceptions.ConnectionClosedOK:
+                logger.info("+++++ConnectionClosedOK")
+                return
+            except Exception as e:
+                logger.exception(e)
+                self.ws = None
+                await asyncio.sleep(1.0)
 
     """
     =================
