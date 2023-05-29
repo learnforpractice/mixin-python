@@ -86,7 +86,7 @@ class MixinBotApi:
         jwtSig = self.genPOSTSig(uristring, bodystring)
         iat = datetime.datetime.utcnow()
         exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=200)
-        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig}, self.private_key, algorithm=self.algorithm)
+        encoded = jwt.encode({'uid':self.client_id, 'sid':self.pay_session_id,'iat':iat,'exp': exp, 'jti':jti,'sig':jwtSig, "scp": "FULL"}, self.private_key, algorithm=self.algorithm)
         return encoded
 
     def gen_encrypted_pin(self, iterString = None):
@@ -168,7 +168,7 @@ class MixinBotApi:
         if isinstance(body, (dict, list)):
             body = json.dumps(body)
         # generate robot's auth token
-        if auth_token == "":
+        if not auth_token:
             auth_token = self.gen_post_jwt_token(path, body, str(uuid.uuid4()))
         headers = {
             'Content-Type'  : 'application/json',
@@ -407,7 +407,8 @@ class MixinBotApi:
         """
         enPin = self.gen_encrypted_pin()
         body = {
-            "pin": enPin
+            "pin_base64": enPin,
+            'timestamp': int(time.time()*1e9)
         }
 
         return await self.__genNetworkPostRequest('/pin/verify', body, auth_token)
