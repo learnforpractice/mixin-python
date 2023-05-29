@@ -1,15 +1,19 @@
+import os
 import sys
 import json
 import uuid
 import asyncio
 import base64
 import logging
+import signal
 from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(module)s %(lineno)d %(message)s')
 logger = logging.getLogger(__name__)
 
 from pymixin.mixin_ws_api import MixinWSApi, MessageView, Category, MessageStatus
+
+print(os.getpid())
 
 bot_config = None
 
@@ -21,6 +25,25 @@ with open(sys.argv[1]) as f:
 class MixinBot(MixinWSApi):
     def __init__(self):
         super().__init__(bot_config, on_message=self.on_message)
+
+    def init(self):
+        loop = asyncio.get_running_loop()
+        loop.add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.handle_signal(signal.SIGINT)))
+        loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.create_task(self.handle_signal(signal.SIGTERM)))
+
+    async def handle_signal(self, signum):
+        logger.info("+++++++handle signal: %s", signum)
+        loop = asyncio.get_running_loop()
+        for task in asyncio.all_tasks(loop):
+            task.cancel()
+
+    async def run(self):
+        self.init()
+        try:
+            await super().run()
+        except asyncio.CancelledError:
+            await self.ws.close()
+            print('CancelledError')
 
     async def on_message(self, id: str, action: str, msg: Optional[MessageView]) -> None:
         logger.info("on_message: %s %s %s", id, action, msg)
@@ -62,6 +85,7 @@ class MixinBot(MixinWSApi):
 bot = MixinBot()
 
 async def start():
+    bot.init()
     await bot.run()
 
 if __name__ == '__main__':
