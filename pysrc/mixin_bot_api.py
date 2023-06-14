@@ -438,7 +438,7 @@ class MixinBotApi:
 
         }
 
-        return await self.__genNetworkPostRequest('/withdrawals/', body)
+        return await self.__genNetworkPostRequest('/withdrawals', body)
 
     async def create_address(self, asset_id, public_key = "", label = "", account_name = "", account_tag = ""):
         """
