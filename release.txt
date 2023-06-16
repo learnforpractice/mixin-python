@@ -1,3 +1,4 @@
-Release v0.2.9
+Release v0.2.10
 
-1. Improve MixinWSAPI class
+1. Fix withdrawals interface
+
