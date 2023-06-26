@@ -65,6 +65,17 @@ jobs:
       #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
       #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Build libmixin.a
+        if: ${{ matrix.os == 'windows-2019' }}
+        working-directory: src/mixin
+        shell: pwsh
+        run: |
+          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+          go build -o mixin.dll -buildmode=c-shared
+          copy mixin.dll ../../pysrc/mixin.dll
+          gendef mixin.dll
+          cmd /c "`"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat`" && lib /def:mixin.def /machine:x64 /out:mixin.lib"
+      - name: Build libmixin.a
+        if: ${{ matrix.os != 'windows-2019' }}
         working-directory: src/mixin
         run: |
           go build -o libmixin.a -buildmode=c-archive
