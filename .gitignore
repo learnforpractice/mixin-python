@@ -1,3 +1,5 @@
+# generated file by cython
+src/_mixin.cpp
 .testnet
 *.wallet
 testnet
